@@ -4,23 +4,54 @@ format: html
 editor: visual
 ---
 
-## Quarto
+-   **Scenario 1**: Infectious disease outbreak (simulated) in California
 
-Quarto enables you to weave together content and executable code into a finished document. To learn more about Quarto see <https://quarto.org>.
+-   A link to your group’s git repository: <https://github.com/schereek/251Project_Kosloski_Tonsing>
 
-## Running Code
+#### **Roles and responsibilities:**
 
-When you click the **Render** button a document will be generated that includes both content and the output of embedded code. You can embed code like this:
+Meeting Planning
 
-```{r}
-1 + 1
-```
+-   What is your team's preferred communication method - email, text, bcourse messaging?
 
-You can add options to executable code like this
+    -   WhatsApp/Email/Zoom
 
-```{r}
-#| echo: false
-2 * 2
-```
+-   When will your team be holding meetings? How frequently will you meet? Are there times or days that work well for everyone?
 
-The `echo: false` option disables the printing of code (only output is displayed).
+    -   As needed, at least weekly via Zoom.
+
+    -   Weekends are best but can make time during the week if needed.
+
+-   Discuss future non-academic commitments that might affect members' availability.
+
+    -   Family, work, life
+
+-   Discuss meeting tempo: “checking in” at the beginning of meetings versus “just sticking to business”.
+
+    -   We have worked together before and have a good rhythm.
+
+Roles
+
+-   How is your team going to keep track of progress? Who will be taking minutes, creating agendas, and contacting the course facilitators with questions?
+
+    -   Weekly check-ins
+
+    -   With two people in our group, we will likley share responsibilty for Who will be taking minutes, creating agendas, and contacting the course facilitators with questions.
+
+        -   Specifically, we will set responsibilities for each milestone at the beginning of each milestone depending on how busy our relative schedules are and the specific assignment requirements.
+
+-   We encourage you to discuss potential dates and times to meet with a course facilitator during Weeks 3-5. Decide on the best date and time for all.
+
+    -   We will check with the course facilitators for their availability.
+
+    -   We tend to be restricted to non-work hours (i.e. after 4pm during the week or weekends.)
+
+Conflict Management
+
+-   If a conflict arises, plan to solve the issue as soon as possible. This is best done using synchronous (Zoom, Google Hangouts) communication rather than asynchronous (email).
+
+    -   We will discuss disagreements, if any, during our weekly zoom calls.
+
+-   If the group is unable to resolve the conflict, seek advice from the instructional team. 
+
+    -   Will do
