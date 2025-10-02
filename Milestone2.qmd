@@ -1,0 +1,77 @@
+---
+title: "Team Project: Scenario 1 - Milestone 2"
+author: "Kosloski & Tonsing"
+format: html
+editor: visual
+---
+
+## **Description of datasets:**
+
+[Dataset 1: sim_novelid_CA.csv]{.underline}
+
+-   Description - This file has weekly outbreak data for all California counties except Los Angeles. It tracks the number of cases and case severity by age group, sex, race/ethnicity, and county.
+
+-   Relevance - We'll use this data to see how the outbreak is spreading across the state and whether certain groups are being hit harder.
+
+[Dataset 2: sim_novelid_LACounty.csv]{.underline}
+
+-   Description - This file has the same kind of outbreak data but just for Los Angeles County.
+
+-   Relevance - Since LA is left out of the first dataset, this one makes sure we can still look at LA and also compare it to the rest of California.
+
+[Dataset 3: ca_pop_2023.csv]{.underline}
+
+-   Description - This file has 2023 population estimates for every county in California, brokesn down by age, sex, and race/ethnicity.
+
+-   Relevance - This file provides the "denominators" we need to calculate things like case rates, so we can compare across groups and counties more fairly.
+
+## **Import statements for all datasets:**
+
+We imported the three datasets directly from the class GitHub repository to ensure consistency across teams. We used the readr package to import because it handles CSVs efficiently and allowed us to specify column types if needed. We used the janitor::clean_names() function to standardize column names into snake_case, which makes them easier to work with in R. The import process was documented in our Quarto file so it can be reproduced by others, and we used arguments like show_col_types = FALSE to simplify the output but still keep the option to control column formats and handle missing values later if needed.
+
+**Import Code:**
+
+```{r}
+
+# Import libraries
+library(readr)
+library(dplyr)
+library(janitor)
+
+# Import and clean column names
+
+sim_ca <- read_csv("data/sim_novelid_CA.csv", show_col_types = FALSE) |> clean_names()
+sim_la <- read_csv("data/sim_novelid_LACounty.csv", show_col_types = FALSE) |> clean_names()
+ca_pop <- read_csv("data/ca_pop_2023.csv", show_col_types = FALSE) |> clean_names()
+
+
+```
+
+## **Identify data types for 5+ elements/columns/variables:**
+
+We focused on five key variables needed for our analysis: county, age category, sex, race/ethnicity, and new infections. Using glimpse() and summary(), we confirmed that the demographic variables were read in as character strings and will be treated as factors for analysis purposes. The case counts (new_infections) are numeric, which is appropriate for calculating totals and rates. We may also use population from the third dataset as a numeric variable for rate calculations. Going forward, we will likely convert demographic variables to factors to simplify groupings and summaries, and to ensure that dates and counts are consistently numeric/date types across datasets.
+
+```{r}
+
+# Look at structure
+
+glimpse(sim_ca) 
+glimpse(sim_la) 
+glimpse(ca_pop)
+
+# Character/factor variables: unique categories
+
+unique(sim_ca$sex)
+unique(sim_ca$age_cat)
+unique(sim_ca$race_ethnicity)
+
+# Numeric variables: summaries
+
+summary(sim_ca$new_infections)
+range(sim_ca$new_infections, na.rm = TRUE)
+
+```
+
+## **Provide a basic description of the 5+ data elements:**
+
+## **Describe cleaning that each data source may need:**
