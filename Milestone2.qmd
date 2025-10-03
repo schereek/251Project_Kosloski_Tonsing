@@ -21,7 +21,7 @@ editor: visual
 
 [Dataset 3: ca_pop_2023.csv]{.underline}
 
--   Description - This file has 2023 population estimates for every county in California, brokesn down by age, sex, and race/ethnicity.
+-   Description - This file has 2023 population estimates for every county in California, broken down by age, sex, and race/ethnicity.
 
 -   Relevance - This file provides the "denominators" we need to calculate things like case rates, so we can compare across groups and counties more fairly.
 
@@ -58,20 +58,63 @@ We focused on five key variables needed for our analysis: county, age category, 
 glimpse(sim_ca) 
 glimpse(sim_la) 
 glimpse(ca_pop)
-
-# Character/factor variables: unique categories
-
-unique(sim_ca$sex)
-unique(sim_ca$age_cat)
-unique(sim_ca$race_ethnicity)
-
-# Numeric variables: summaries
-
-summary(sim_ca$new_infections)
-range(sim_ca$new_infections, na.rm = TRUE)
-
 ```
 
 ## **Provide a basic description of the 5+ data elements:**
 
+```{r by county}
+# Character/factor variables: unique categories
+unique(sim_ca$sex)
+unique(sim_ca$age_cat)
+unique(sim_ca$race_ethnicity)
+```
+
+```{r LA county}
+# Character/factor variables: unique categories
+unique(sim_la$sex)
+unique(sim_la$age_category)
+unique(sim_la$race_eth)
+```
+
+```{r whole state}
+# Character/factor variables: unique categories
+unique(ca_pop$sex)
+unique(ca_pop$age_cat)
+unique(ca_pop$race7)
+```
+
+```{r all except LA}
+# Numeric variables: summaries
+summary(sim_ca$new_infections)
+range(sim_ca$new_infections, na.rm = TRUE)
+```
+
+```{r LA county only}
+# Numeric variables: summaries
+summary(sim_la$dx_new)
+range(sim_la$dx_new, na.rm = TRUE)
+```
+
 ## **Describe cleaning that each data source may need:**
+
+-   Columns in the sim_ca and sim_la data sets are in a different order and will need to be standardized before joining.
+
+-   sim_ca uses the column name dt_diagnosis and sim_la uses dt_dx and the dates are in different formats - This will need to be standardized before joining the data sets.
+
+-   sim_ca uses the column name race_ethnicity and encodes this information as numeric (dbl) values. sim_la uses the column name race_eth and encodes the data as character. ca_pop uses the column name race7 and also encodes the data as character data, but is using different designators for the races. We will need some kind of a "key" for each of the data sets before we can standardize if this is a variable we end up needing.
+
+-   sim_ca uses the column name new_infections and sim_la uses the column name dx_new to encode the daily incidence. These column names will need to be standardized before joining data sets.
+
+-   sim_ca uses the column name cumulative_infected and sim_la uses the column name infected_cumulative to encode the same information. These column names will need to be standardized before joining data sets.
+
+-   sim_ca uses the column name new_unrecovered and sim_la uses the column name unrecovered_new to encode the same information. These column names will need to be standardized before joining data sets.
+
+-   sim_ca uses the column name cumulative_unrecovered and sim_la uses the column name unrecovered_cumulative to encode the same information. These column names will need to be standardized before joining data sets.
+
+-   sim_ca uses the column name new_severe and sim_la uses the column name severe_new to encode the same information. These column names will need to be standardized before joining data sets.
+
+-   sim_ca uses the column name cumulative_severe and sim_la uses the column name severe_cumulative to encode the same information. These column names will need to be standardized before joining data sets.
+
+-   ca_pop has different age categories than both sim_ca and sim_la. The categories will need to be standardized if we chose to use this variable.
+
+-   sim_ca and ca_pop both call the column age_cat, but sim_la calls it age_category. These column names will need to be standardized before joining data sets.
