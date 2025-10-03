@@ -117,7 +117,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </ul>
 <p><u>Dataset 3: ca_pop_2023.csv</u></p>
 <ul>
-<li><p>Description - This file has 2023 population estimates for every county in California, brokesn down by age, sex, and race/ethnicity.</p></li>
+<li><p>Description - This file has 2023 population estimates for every county in California, broken down by age, sex, and race/ethnicity.</p></li>
 <li><p>Relevance - This file provides the “denominators” we need to calculate things like case rates, so we can compare across groups and counties more fairly.</p></li>
 </ul>
 </section>
@@ -210,9 +210,13 @@ $ sex                   &lt;chr&gt; "FEMALE", "FEMALE", "FEMALE", "FEMALE", "FEM
 $ race7                 &lt;chr&gt; "WhiteTE NH", "WhiteTE NH", "WhiteTE NH", "White…
 $ pop                   &lt;dbl&gt; 2008, 2128, 2142, 2057, 1965, 2017, 1835, 1840, …</code></pre>
 </div>
+</div>
+</section>
+<section id="provide-a-basic-description-of-the-5-data-elements" class="level2">
+<h2 class="anchored" data-anchor-id="provide-a-basic-description-of-the-5-data-elements"><strong>Provide a basic description of the 5+ data elements:</strong></h2>
+<div class="cell">
 <div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Character/factor variables: unique categories</span></span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="fu">unique</span>(sim_ca<span class="sc">$</span>sex)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="fu">unique</span>(sim_ca<span class="sc">$</span>sex)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] "FEMALE" "MALE"  </code></pre>
 </div>
@@ -224,24 +228,84 @@ $ pop                   &lt;dbl&gt; 2008, 2128, 2142, 2057, 1965, 2017, 1835, 18
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 1 2 3 4 5 6 7</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Numeric variables: summaries</span></span>
-<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(sim_ca<span class="sc">$</span>new_infections)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Character/factor variables: unique categories</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="fu">unique</span>(sim_la<span class="sc">$</span>sex)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "FEMALE" "MALE"  </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="fu">unique</span>(sim_la<span class="sc">$</span>age_category)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "0-17"  "18-49" "50-64" "65+"  </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="fu">unique</span>(sim_la<span class="sc">$</span>race_eth)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "White, Non-Hispanic"                                   
+[2] "Black, Non-Hispanic"                                   
+[3] "American Indian or Alaska Native, Non-Hispanic"        
+[4] "Asian, Non-Hispanic"                                   
+[5] "Native Hawaiian or Pacific Islander, Non-Hispanic"     
+[6] "Multiracial (two or more of above races), Non-Hispanic"
+[7] "Hispanic (any race)"                                   </code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Character/factor variables: unique categories</span></span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a><span class="fu">unique</span>(ca_pop<span class="sc">$</span>sex)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "FEMALE" "MALE"  </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="fu">unique</span>(ca_pop<span class="sc">$</span>age_cat)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "0-4"   "5-11"  "12-17" "18-49" "50-64" "65+"  </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="fu">unique</span>(ca_pop<span class="sc">$</span>race7)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "WhiteTE NH" "Black NH"   "AIAN NH"    "Asian NH"   "NHPI NH"   
+[6] "MR NH"      "Hispanic"  </code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Numeric variables: summaries</span></span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(sim_ca<span class="sc">$</span>new_infections)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
    0.00    0.00    1.00   37.02    8.00 7142.00 </code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="fu">range</span>(sim_ca<span class="sc">$</span>new_infections, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="fu">range</span>(sim_ca<span class="sc">$</span>new_infections, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1]    0 7142</code></pre>
 </div>
 </div>
-</section>
-<section id="provide-a-basic-description-of-the-5-data-elements" class="level2">
-<h2 class="anchored" data-anchor-id="provide-a-basic-description-of-the-5-data-elements"><strong>Provide a basic description of the 5+ data elements:</strong></h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Numeric variables: summaries</span></span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(sim_la<span class="sc">$</span>dx_new)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+    0.0     4.0    46.0   510.5   404.2 12110.0 </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="fu">range</span>(sim_la<span class="sc">$</span>dx_new, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1]     0 12110</code></pre>
+</div>
+</div>
 </section>
 <section id="describe-cleaning-that-each-data-source-may-need" class="level2">
 <h2 class="anchored" data-anchor-id="describe-cleaning-that-each-data-source-may-need"><strong>Describe cleaning that each data source may need:</strong></h2>
+<ul>
+<li><p>Columns in the sim_ca and sim_la data sets are in a different order and will need to be standardized before joining.</p></li>
+<li><p>sim_ca uses the column name dt_diagnosis and sim_la uses dt_dx and the dates are in different formats - This will need to be standardized before joining the data sets.</p></li>
+<li><p>sim_ca uses the column name race_ethnicity and encodes this information as numeric (dbl) values. sim_la uses the column name race_eth and encodes the data as character. ca_pop uses the column name race7 and also encodes the data as character data, but is using different designators for the races. We will need some kind of a “key” for each of the data sets before we can standardize if this is a variable we end up needing.</p></li>
+<li><p>sim_ca uses the column name new_infections and sim_la uses the column name dx_new to encode the daily incidence. These column names will need to be standardized before joining data sets.</p></li>
+<li><p>sim_ca uses the column name cumulative_infected and sim_la uses the column name infected_cumulative to encode the same information. These column names will need to be standardized before joining data sets.</p></li>
+<li><p>sim_ca uses the column name new_unrecovered and sim_la uses the column name unrecovered_new to encode the same information. These column names will need to be standardized before joining data sets.</p></li>
+<li><p>sim_ca uses the column name cumulative_unrecovered and sim_la uses the column name unrecovered_cumulative to encode the same information. These column names will need to be standardized before joining data sets.</p></li>
+<li><p>sim_ca uses the column name new_severe and sim_la uses the column name severe_new to encode the same information. These column names will need to be standardized before joining data sets.</p></li>
+<li><p>sim_ca uses the column name cumulative_severe and sim_la uses the column name severe_cumulative to encode the same information. These column names will need to be standardized before joining data sets.</p></li>
+<li><p>ca_pop has different age categories than both sim_ca and sim_la. The categories will need to be standardized if we chose to use this variable.</p></li>
+<li><p>sim_ca and ca_pop both call the column age_cat, but sim_la calls it age_category. These column names will need to be standardized before joining data sets.</p></li>
+</ul>
 </section>
 
 </main>

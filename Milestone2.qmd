@@ -62,6 +62,8 @@ glimpse(ca_pop)
 
 ## **Provide a basic description of the 5+ data elements:**
 
+We started by taking a look at what’s in our dataset. For the demographic variables, we pulled up the categories for sex (like *Male* and *Female*), age groups (such as *0–17* or *18–49*), and race/ethnicity (like *White, Black, Asian, Hispanic*). We also checked the outcome variables by running summaries of new infections and new diagnoses, which range from zero up to over 12,000 in some cases. This gave us a quick sense of what the data look like before moving on to deeper analysis.
+
 ```{r by county}
 # Character/factor variables: unique categories
 unique(sim_ca$sex)
@@ -96,6 +98,44 @@ range(sim_la$dx_new, na.rm = TRUE)
 ```
 
 ## **Describe cleaning that each data source may need:**
+
+Before joining the different datasets, we need to address inconsistencies in column names, data types, and category definitions. Without cleaning, these differences could cause errors or mismatches in the combined dataset.
+
+[Column name differences]{.underline}:
+
+-   dt_diagnosis (sim_ca) vs dt_dx (sim_la) – dates also use different formats.
+
+-   new_infections (sim_ca) vs dt_dx (sim_la).
+
+-   cumulative_infected (sim_ca) vs infected_cumulative (sim_la).
+
+-   new_unrecovered (sim_ca) vs unrecovered_new (sim_la).
+
+-   cumulative_unrecovered (sim_ca) vs unrecovered_cumulative (sim_la).
+
+-   new_severe (sim_ca) vs severe_new (sim_la).
+
+-   cumulative_severe (sim_ca) vs severe_cumulative (sim_la).
+
+-   age_cat (sim_ca, ca_pop) vs age_category (sim_la).
+
+[Variable encoding differences:]{.underline}
+
+-   race_ethnicity in sim_ca is stored as numeric values, while race_eth in sim_la is character data.
+
+-   race7 in ca_pop is also character data but uses different labels/designators than sim_la.
+
+[Category definition differences:]{.underline}
+
+-   Age groupings differ between ca_pop and the other two datasets (ca_pop has more finely split categories).
+
+-   Race/ethnicity categories are not standardized across datasets and will need a key or mapping.
+
+[Column order differences]{.underline}:
+
+-   Columns appear in different orders in sim_ca and sim_la and will need to be standardized before merging.
+
+ORIGINAL BULLETS
 
 -   Columns in the sim_ca and sim_la data sets are in a different order and will need to be standardized before joining.
 
