@@ -105,7 +105,7 @@ Before joining the different datasets, we need to address inconsistencies in col
 
 -   dt_diagnosis (sim_ca) vs dt_dx (sim_la) – dates also use different formats.
 
--   new_infections (sim_ca) vs dt_dx (sim_la).
+-   new_infections (sim_ca) vs dx_new (sim_la).
 
 -   cumulative_infected (sim_ca) vs infected_cumulative (sim_la).
 
@@ -129,32 +129,8 @@ Before joining the different datasets, we need to address inconsistencies in col
 
 -   Age groupings differ between ca_pop and the other two datasets (ca_pop has more finely split categories).
 
--   Race/ethnicity categories are not standardized across datasets and will need a key or mapping.
+-   Race/ethnicity categories are not standardized across datasets and will need a key or mapping before standardizing.
 
 [Column order differences]{.underline}:
 
 -   Columns appear in different orders in sim_ca and sim_la and will need to be standardized before merging.
-
-ORIGINAL BULLETS
-
--   Columns in the sim_ca and sim_la data sets are in a different order and will need to be standardized before joining.
-
--   sim_ca uses the column name dt_diagnosis and sim_la uses dt_dx and the dates are in different formats - This will need to be standardized before joining the data sets.
-
--   sim_ca uses the column name race_ethnicity and encodes this information as numeric (dbl) values. sim_la uses the column name race_eth and encodes the data as character. ca_pop uses the column name race7 and also encodes the data as character data, but is using different designators for the races. We will need some kind of a "key" for each of the data sets before we can standardize if this is a variable we end up needing.
-
--   sim_ca uses the column name new_infections and sim_la uses the column name dx_new to encode the daily incidence. These column names will need to be standardized before joining data sets.
-
--   sim_ca uses the column name cumulative_infected and sim_la uses the column name infected_cumulative to encode the same information. These column names will need to be standardized before joining data sets.
-
--   sim_ca uses the column name new_unrecovered and sim_la uses the column name unrecovered_new to encode the same information. These column names will need to be standardized before joining data sets.
-
--   sim_ca uses the column name cumulative_unrecovered and sim_la uses the column name unrecovered_cumulative to encode the same information. These column names will need to be standardized before joining data sets.
-
--   sim_ca uses the column name new_severe and sim_la uses the column name severe_new to encode the same information. These column names will need to be standardized before joining data sets.
-
--   sim_ca uses the column name cumulative_severe and sim_la uses the column name severe_cumulative to encode the same information. These column names will need to be standardized before joining data sets.
-
--   ca_pop has different age categories than both sim_ca and sim_la. The categories will need to be standardized if we chose to use this variable.
-
--   sim_ca and ca_pop both call the column age_cat, but sim_la calls it age_category. These column names will need to be standardized before joining data sets.
