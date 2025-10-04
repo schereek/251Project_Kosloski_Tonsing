@@ -214,6 +214,7 @@ $ pop                   &lt;dbl&gt; 2008, 2128, 2142, 2057, 1965, 2017, 1835, 18
 </section>
 <section id="provide-a-basic-description-of-the-5-data-elements" class="level2">
 <h2 class="anchored" data-anchor-id="provide-a-basic-description-of-the-5-data-elements"><strong>Provide a basic description of the 5+ data elements:</strong></h2>
+<p>We started by taking a look at what’s in our dataset. For the demographic variables, we pulled up the categories for sex (like <em>Male</em> and <em>Female</em>), age groups (such as <em>0–17</em> or <em>18–49</em>), and race/ethnicity (like <em>White, Black, Asian, Hispanic</em>). We also checked the outcome variables by running summaries of new infections and new diagnoses, which range from zero up to over 12,000 in some cases. This gave us a quick sense of what the data look like before moving on to deeper analysis.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Character/factor variables: unique categories</span></span>
 <span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="fu">unique</span>(sim_ca<span class="sc">$</span>sex)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -293,18 +294,31 @@ $ pop                   &lt;dbl&gt; 2008, 2128, 2142, 2057, 1965, 2017, 1835, 18
 </section>
 <section id="describe-cleaning-that-each-data-source-may-need" class="level2">
 <h2 class="anchored" data-anchor-id="describe-cleaning-that-each-data-source-may-need"><strong>Describe cleaning that each data source may need:</strong></h2>
+<p>Before joining the different datasets, we need to address inconsistencies in column names, data types, and category definitions. Without cleaning, these differences could cause errors or mismatches in the combined dataset.</p>
+<p><u>Column name differences</u>:</p>
 <ul>
-<li><p>Columns in the sim_ca and sim_la data sets are in a different order and will need to be standardized before joining.</p></li>
-<li><p>sim_ca uses the column name dt_diagnosis and sim_la uses dt_dx and the dates are in different formats - This will need to be standardized before joining the data sets.</p></li>
-<li><p>sim_ca uses the column name race_ethnicity and encodes this information as numeric (dbl) values. sim_la uses the column name race_eth and encodes the data as character. ca_pop uses the column name race7 and also encodes the data as character data, but is using different designators for the races. We will need some kind of a “key” for each of the data sets before we can standardize if this is a variable we end up needing.</p></li>
-<li><p>sim_ca uses the column name new_infections and sim_la uses the column name dx_new to encode the daily incidence. These column names will need to be standardized before joining data sets.</p></li>
-<li><p>sim_ca uses the column name cumulative_infected and sim_la uses the column name infected_cumulative to encode the same information. These column names will need to be standardized before joining data sets.</p></li>
-<li><p>sim_ca uses the column name new_unrecovered and sim_la uses the column name unrecovered_new to encode the same information. These column names will need to be standardized before joining data sets.</p></li>
-<li><p>sim_ca uses the column name cumulative_unrecovered and sim_la uses the column name unrecovered_cumulative to encode the same information. These column names will need to be standardized before joining data sets.</p></li>
-<li><p>sim_ca uses the column name new_severe and sim_la uses the column name severe_new to encode the same information. These column names will need to be standardized before joining data sets.</p></li>
-<li><p>sim_ca uses the column name cumulative_severe and sim_la uses the column name severe_cumulative to encode the same information. These column names will need to be standardized before joining data sets.</p></li>
-<li><p>ca_pop has different age categories than both sim_ca and sim_la. The categories will need to be standardized if we chose to use this variable.</p></li>
-<li><p>sim_ca and ca_pop both call the column age_cat, but sim_la calls it age_category. These column names will need to be standardized before joining data sets.</p></li>
+<li><p>dt_diagnosis (sim_ca) vs dt_dx (sim_la) – dates also use different formats.</p></li>
+<li><p>new_infections (sim_ca) vs dx_new (sim_la).</p></li>
+<li><p>cumulative_infected (sim_ca) vs infected_cumulative (sim_la).</p></li>
+<li><p>new_unrecovered (sim_ca) vs unrecovered_new (sim_la).</p></li>
+<li><p>cumulative_unrecovered (sim_ca) vs unrecovered_cumulative (sim_la).</p></li>
+<li><p>new_severe (sim_ca) vs severe_new (sim_la).</p></li>
+<li><p>cumulative_severe (sim_ca) vs severe_cumulative (sim_la).</p></li>
+<li><p>age_cat (sim_ca, ca_pop) vs age_category (sim_la).</p></li>
+</ul>
+<p><u>Variable encoding differences:</u></p>
+<ul>
+<li><p>race_ethnicity in sim_ca is stored as numeric values, while race_eth in sim_la is character data.</p></li>
+<li><p>race7 in ca_pop is also character data but uses different labels/designators than sim_la.</p></li>
+</ul>
+<p><u>Category definition differences:</u></p>
+<ul>
+<li><p>Age groupings differ between ca_pop and the other two datasets (ca_pop has more finely split categories).</p></li>
+<li><p>Race/ethnicity categories are not standardized across datasets and will need a key or mapping before standardizing.</p></li>
+</ul>
+<p><u>Column order differences</u>:</p>
+<ul>
+<li>Columns appear in different orders in sim_ca and sim_la and will need to be standardized before merging.</li>
 </ul>
 </section>
 
