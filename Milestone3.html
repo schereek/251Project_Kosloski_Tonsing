@@ -322,7 +322,27 @@ Attaching package: 'janitor'</code></pre>
 <section id="population-dataset" class="level2">
 <h2 class="anchored" data-anchor-id="population-dataset">Population dataset</h2>
 <p><strong>Step 1: Recode values to be consistent with morbidity datasets so they can be joined</strong></p>
-<p><strong>Step 2: Select demographic or geogrphic strata(s) of interest</strong></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>ca_pop_clean <span class="ot">&lt;-</span> ca_pop <span class="sc">%&gt;%</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">clean_names</span>() <span class="sc">%&gt;%</span>   </span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">population =</span> pop) <span class="sc">%&gt;%</span></span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">race_ethnicity =</span> <span class="fu">recode</span>(</span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>      race7,</span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>      <span class="st">"WhiteTE NH"</span> <span class="ot">=</span> <span class="st">"White, Non-Hispanic"</span>,   </span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>      <span class="st">"Black NH"</span>   <span class="ot">=</span> <span class="st">"Black, Non-Hispanic"</span>,</span>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>      <span class="st">"AIAN NH"</span>    <span class="ot">=</span> <span class="st">"American Indian or Alaska Native, Non-Hispanic"</span>,</span>
+<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a>      <span class="st">"Asian NH"</span>   <span class="ot">=</span> <span class="st">"Asian, Non-Hispanic"</span>,</span>
+<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a>      <span class="st">"NHPI NH"</span>    <span class="ot">=</span> <span class="st">"Native Hawaiian or Pacific Islander, Non-Hispanic"</span>,</span>
+<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a>      <span class="st">"MR NH"</span>      <span class="ot">=</span> <span class="st">"Multiracial (two or more of above races), Non-Hispanic"</span>,</span>
+<span id="cb19-13"><a href="#cb19-13" aria-hidden="true" tabindex="-1"></a>      <span class="st">"Hispanic"</span>   <span class="ot">=</span> <span class="st">"Hispanic (any race)"</span>),</span>
+<span id="cb19-14"><a href="#cb19-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">sex    =</span> <span class="fu">str_to_title</span>(sex),      <span class="co"># FEMALE → Female</span></span>
+<span id="cb19-15"><a href="#cb19-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">county =</span> <span class="fu">str_to_title</span>(county)    <span class="co"># ALAMEDA COUNTY → Alameda County</span></span>
+<span id="cb19-16"><a href="#cb19-16" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb19-17"><a href="#cb19-17" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb19-18"><a href="#cb19-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(county, age_cat, sex, race_ethnicity, population)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><strong>Step 2: Select demographic or geographic strata(s) of interest</strong></p>
 <p><strong>Step 3: Create a rate metric and summarize to include only one row per strata of interest</strong></p>
 </section>
 

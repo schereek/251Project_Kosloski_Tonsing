@@ -148,6 +148,29 @@ TBD based on Step 3...
 
 **Step 1: Recode values to be consistent with morbidity datasets so they can be joined**
 
-**Step 2: Select demographic or geogrphic strata(s) of interest**
+```{r}
+
+ca_pop_clean <- ca_pop %>%
+  clean_names() %>%   
+  rename(population = pop) %>%
+  mutate(
+    race_ethnicity = recode(
+      race7,
+      "WhiteTE NH" = "White, Non-Hispanic",   
+      "Black NH"   = "Black, Non-Hispanic",
+      "AIAN NH"    = "American Indian or Alaska Native, Non-Hispanic",
+      "Asian NH"   = "Asian, Non-Hispanic",
+      "NHPI NH"    = "Native Hawaiian or Pacific Islander, Non-Hispanic",
+      "MR NH"      = "Multiracial (two or more of above races), Non-Hispanic",
+      "Hispanic"   = "Hispanic (any race)"),
+    sex    = str_to_title(sex),      # FEMALE → Female
+    county = str_to_title(county)    # ALAMEDA COUNTY → Alameda County
+  ) %>%
+  
+  select(county, age_cat, sex, race_ethnicity, population)
+
+```
+
+**Step 2: Select demographic or geographic strata(s) of interest**
 
 **Step 3: Create a rate metric and summarize to include only one row per strata of interest**
