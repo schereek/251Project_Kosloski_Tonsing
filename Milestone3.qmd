@@ -1,0 +1,153 @@
+---
+title: "Milestone 3: Data Cleaning and Descriptive Statistics"
+author: "Kosloski & Tonsing"
+format: html
+editor: visual
+---
+
+## Morbidity datasets (from CA and LA County)
+
+Loading libraries and morbidity data sets from CA and LA County
+
+```{r}
+
+# Import libraries
+library(readr)
+library(dplyr)
+library(janitor)
+
+# Import and clean column names (this was cut and pasted from Milestone2 qmd)
+
+sim_ca <- read_csv("data/sim_novelid_CA.csv", show_col_types = FALSE) |> clean_names()
+sim_la <- read_csv("data/sim_novelid_LACounty.csv", show_col_types = FALSE) |> clean_names()
+ca_pop <- read_csv("data/ca_pop_2023.csv", show_col_types = FALSE) |> clean_names()
+
+
+```
+
+```{r}
+
+library(tidyverse)
+library(janitor)
+
+sim_ca <- sim_ca %>% clean_names()
+sim_la <- sim_la %>% clean_names()
+ca_pop <- ca_pop %>% clean_names()
+
+names(sim_ca)
+names(sim_la)
+
+```
+
+**Step 1: Recode column names, values, or formats that are in discordant (dates, etc)**
+
+To prepare the morbidity datasets for analysis, we compared the column names in the California (sim_ca) and Los Angeles (sim_la) files and found several inconsistencies. The same variables were labeled differently across datasets (for example, dt_dx vs. dt_diagnosis, dx_new vs. new_infections). To make them compatible, we created a clear mapping and renamed the LA variables to match the CA format. We also added a county column to the LA data so both files included the same geographic identifier. This standardization step was necessary to allow the two datasets to be combined into one complete morbidity dataset for the state.
+
+| **Original (sim_la)** | **Renamed To (standardized)** | **Purpose / Notes** |
+|---------------------|-----------------------|-----------------------------|
+| age_categorydx | dt_diagnosis | Diagnosis date; matches CA dataset |
+| age_category | age_cat | Age group variable |
+| sex | sex | Same name, no change |
+| race_eth | race_ethnicity | Aligns with CA naming convention |
+| dt_report | *(not used)* | LA-specific; excluded to align with CA |
+| dx_new | new_infections | Number of newly diagnosed infections |
+| infected_cumulative | cumulative_infected | Total infections to date |
+| unrecovered_new | new_unrecovered | Newly unrecovered cases |
+| unrecovered_cumulative | cumulative`_`unrecovered | Total unrecovered cases |
+| severe_new | new\_ severe | Newly severe cases |
+| severe_cumulative | cumulative_severe | Total severe cases |
+| *(new variable)* | county = "Los Angeles" | Added to identify LA County source |
+
+```{r}
+
+sim_la_clean1 <- sim_la %>%
+  mutate(county = "Los Angeles") %>%
+  rename(
+    dt_diagnosis = dt_dx, 
+    age_cat = age_category,
+    race_ethnicity = race_eth,
+    new_infections = dx_new,
+    cumulative_infected = infected_cumulative,
+    new_unrecovered = unrecovered_new,
+    cumulative_unrecovered = unrecovered_cumulative,
+    new_severe = severe_new,
+    cumulative_severe = severe_cumulative
+  ) %>%
+  select(
+    county, age_cat, sex, race_ethnicity, dt_diagnosis,
+    new_infections, cumulative_infected,
+    new_unrecovered, cumulative_unrecovered,
+    new_severe, cumulative_severe
+  )
+
+```
+
+After aligning the column names, we reviewed the variable values to make sure they were coded consistently across both datasets. Using the project codebook, we recoded the numeric race and ethnicity values in the California dataset into descriptive text labels so they matched the LA County format. We also converted the LA date variable from a SAS-style format (DDMONYYYY) to a standard date format (YYYY-MM-DD).These updates ensured that both datasets use the same categories and formats, which will make it easier to analyze and compare results once they are combined.
+
+```{r}
+
+# Clean and standardize CA Morbidity values
+
+sim_ca_clean1 <- sim_ca %>%  
+  clean_names() %>%
+  mutate(
+    race_ethnicity = recode(race_ethnicity,
+      "1" = "White, Non-Hispanic",
+      "2" = "Black, Non-Hispanic",
+      "3" = "American Indian or Alaska Native, Non-Hispanic",
+      "4" = "Asian, Non-Hispanic",
+      "5" = "Native Hawaiian or Pacific Islander, Non-Hispanic",
+      "6" = "Multiracial (two or more of above races), Non-Hispanic",
+      "7" = "Hispanic (any race)",
+      "9" = "Unknown"))
+  
+# Clean and standardize LA Morbidity values
+
+sim_la_clean2 <- sim_la_clean1 %>%
+  mutate(
+    
+    # Convert SAS-style date (e.g., 23OCT2023) to YYYY-MM-DD
+    dt_diagnosis = as.Date(dt_diagnosis, format = "%d%b%Y"),
+    
+    # Ensure consistent capitalization and remove stray spaces in race/ethnicity
+    race_ethnicity = str_to_title(str_trim(race_ethnicity)),
+    
+    # Clean capitalization for sex variable
+    sex = str_to_title(sex))
+  
+```
+
+When comparing the column headers, we found one additional variable in the California dataset that was not present in the Los Angeles County file. This column captured time intervals that were not needed for our current analysis, so we removed it to keep the datasets consistent before merging. Step 2: Combine morbidity datasets into a single dataset
+
+```{r}
+
+sim_ca_clean2 <- sim_ca_clean1 %>%
+  select(-time_int)
+  
+```
+
+**Step 2: Combine morbidity datasets into a single dataset**
+
+Now that both morbidity files used the same variable names and value formats, we combined them into one dataset using the bind_rows() function. This step let us put the statewide California records and the Los Angeles County records together in a single file so we can analyze all reported cases at once.
+
+```{r}
+
+morbidity_all <- bind_rows(sim_ca_clean2, sim_la_clean2)
+
+```
+
+**Step 3: Select demographic and geographic strata (s) of interest**
+
+For the next step, we identified the demographic and geographic strata we want to analyze. The dataset includes several variables that describe population subgroups, such as county, age group, sex, and race/ethnicity. For this analysis, we will focus on differences by ????????, since these are key factors that often influence disease patterns in public health data.
+
+**Step 4: Aggregate the data into a new dataframe to include only one row per strata of interest**
+
+TBD based on Step 3...
+
+## Population dataset
+
+**Step 1: Recode values to be consistent with morbidity datasets so they can be joined**
+
+**Step 2: Select demographic or geogrphic strata(s) of interest**
+
+**Step 3: Create a rate metric and summarize to include only one row per strata of interest**
