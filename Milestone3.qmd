@@ -99,7 +99,9 @@ sim_ca_clean1 <- sim_ca %>%
       "5" = "Native Hawaiian or Pacific Islander, Non-Hispanic",
       "6" = "Multiracial (two or more of above races), Non-Hispanic",
       "7" = "Hispanic (any race)",
-      "9" = "Unknown"))
+      "9" = "Unknown"),
+    sex = str_to_title(str_trim(sex))
+    )
   
 # Clean and standardize LA Morbidity values
 
@@ -142,7 +144,91 @@ For the next step, we identified the demographic and geographic strata we want t
 
 **Step 4: Aggregate the data into a new dataframe to include only one row per strata of interest**
 
-TBD based on Step 3...
+```{r}
+morbidity_by_sex <- morbidity_all %>%
+  select(-county, -age_cat, -race_ethnicity, -dt_diagnosis,
+         -cumulative_infected, -cumulative_unrecovered,
+         -cumulative_severe, -new_unrecovered) %>%
+  group_by(sex) %>%
+  summarise(
+    tot_new_infections = sum(new_infections, na.rm = TRUE),
+    tot_new_severe = sum(new_severe, na.rm = TRUE)
+  ) %>%
+  ungroup() %>%
+  bind_rows(
+    summarise(., 
+      sex = "Total",
+      tot_new_infections = sum(tot_new_infections, na.rm = TRUE),
+      tot_new_severe = sum(tot_new_severe, na.rm = TRUE)
+    )
+  )
+morbidity_by_sex
+```
+
+```{r}
+morbidity_by_county <- morbidity_all %>%
+  select(-sex, -age_cat, -race_ethnicity, -dt_diagnosis,
+         -cumulative_infected, -cumulative_unrecovered,
+         -cumulative_severe, -new_unrecovered) %>%
+  group_by(county) %>%
+  summarise(
+    tot_new_infections = sum(new_infections, na.rm = TRUE),
+    tot_new_severe = sum(new_severe, na.rm = TRUE)
+  ) %>%
+  ungroup() %>%
+  bind_rows(
+    summarise(., 
+      county = "Total",
+      tot_new_infections = sum(tot_new_infections, na.rm = TRUE),
+      tot_new_severe = sum(tot_new_severe, na.rm = TRUE)
+    )
+  )
+# I'm going to try a pivot longer on this to see if it look better later (need to feed kids)
+head(morbidity_by_county)
+```
+
+```{r}
+morbidity_by_race_ethnicity <- morbidity_all %>%
+  select(-sex, -age_cat, -county, -dt_diagnosis,
+         -cumulative_infected, -cumulative_unrecovered,
+         -cumulative_severe, -new_unrecovered) %>%
+  group_by(race_ethnicity) %>%
+  summarise(
+    tot_new_infections = sum(new_infections, na.rm = TRUE),
+    tot_new_severe = sum(new_severe, na.rm = TRUE)
+  ) %>%
+  ungroup() %>%
+  bind_rows(
+    summarise(., 
+      race_ethnicity = "Total",
+      tot_new_infections = sum(tot_new_infections, na.rm = TRUE),
+      tot_new_severe = sum(tot_new_severe, na.rm = TRUE)
+    )
+  )
+# We need to do some additional data cleaning on the race/ethnicity groups
+head(morbidity_by_race_ethnicity)
+```
+
+```{r}
+morbidity_by_age <- morbidity_all %>%
+  select(-county, -sex, -race_ethnicity, -dt_diagnosis,
+         -cumulative_infected, -cumulative_unrecovered,
+         -cumulative_severe, -new_unrecovered) %>%
+  group_by(age_cat) %>%
+  summarise(
+    tot_new_infections = sum(new_infections, na.rm = TRUE),
+    tot_new_severe = sum(new_severe, na.rm = TRUE)
+  ) %>%
+  ungroup() %>%
+  bind_rows(
+    summarise(., 
+      age_cat = "Total",
+      tot_new_infections = sum(tot_new_infections, na.rm = TRUE),
+      tot_new_severe = sum(tot_new_severe, na.rm = TRUE)
+    )
+  )
+morbidity_by_age
+```
 
 ## Population dataset
 
