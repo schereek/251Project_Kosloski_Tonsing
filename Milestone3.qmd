@@ -111,8 +111,14 @@ sim_la_clean2 <- sim_la_clean1 %>%
     # Convert SAS-style date (e.g., 23OCT2023) to YYYY-MM-DD
     dt_diagnosis = as.Date(dt_diagnosis, format = "%d%b%Y"),
     
+    race_ethnicity = str_trim(race_ethnicity),
+    
     # Ensure consistent capitalization and remove stray spaces in race/ethnicity
-    race_ethnicity = str_to_title(str_trim(race_ethnicity)),
+    race_ethnicity = str_trim(race_ethnicity),
+    race_ethnicity = recode(
+      race_ethnicity,
+      "Hispanic (Any Race)" = "Hispanic (any race)",
+      "American Indian Or Alaska Native, Non-Hispanic" = "American Indian or Alaska            Native, Non-Hispanic", "Native Hawaiian Or Pacific Islander, Non-Hispanic" =           "Native Hawaiian or Pacific Islander, Non-Hispanic", "Multiracial (Two Or More Of        Above Races), Non-Hispanic" = "Multiracial (two or more of above races), Non            -Hispanic"),
     
     # Clean capitalization for sex variable
     sex = str_to_title(sex))
