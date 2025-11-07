@@ -100,8 +100,9 @@ sim_ca_clean1 <- sim_ca %>%
       "6" = "Multiracial (two or more of above races), Non-Hispanic",
       "7" = "Hispanic (any race)",
       "9" = "Unknown"),
-    sex = str_to_title(str_trim(sex))
-    )
+    sex = str_to_title(str_trim(sex)),
+    # Remove the word "County" and trim any trailing spaces in county names to align with population data set
+    county = str_remove(county, regex("\\s*County$", ignore_case = TRUE)) %>% str_trim())
   
 # Clean and standardize LA Morbidity values
 
@@ -121,7 +122,11 @@ sim_la_clean2 <- sim_la_clean1 %>%
       "American Indian Or Alaska Native, Non-Hispanic" = "American Indian or Alaska            Native, Non-Hispanic", "Native Hawaiian Or Pacific Islander, Non-Hispanic" =           "Native Hawaiian or Pacific Islander, Non-Hispanic", "Multiracial (Two Or More Of        Above Races), Non-Hispanic" = "Multiracial (two or more of above races), Non            -Hispanic"),
     
     # Clean capitalization for sex variable
-    sex = str_to_title(sex))
+    sex = str_to_title(sex),
+    
+     # Remove the word "County" and trim any trailing spaces in county names to align with population data set
+    county = str_remove(county, regex("\\s*County$", ignore_case = TRUE)) %>% str_trim()
+  )
   
 ```
 
@@ -146,26 +151,35 @@ morbidity_all <- bind_rows(sim_ca_clean2, sim_la_clean2)
 
 **Step 3: Select demographic and geographic strata (s) of interest**
 
-For the next step, we identified the demographic and geographic strata we want to analyze. The dataset includes several variables that describe population subgroups, such as county, age group, sex, and race/ethnicity. For this analysis, we will focus on differences by ????????, since these are key factors that often influence disease patterns in public health data.
+For the next step, we identified the demographic and geographic strata we want to analyze. The dataset includes several variables that describe population subgroups, such as county, age group, sex, and race/ethnicity. For this analysis, we will focus on differences by sex, county, race/ethnicity, and age, since these are key factors that often influence disease patterns in public health data.
 
 **Step 4: Aggregate the data into a new dataframe to include only one row per strata of interest**
 
 ```{r}
 morbidity_by_sex <- morbidity_all %>%
-  select(-county, -age_cat, -race_ethnicity, -dt_diagnosis,
-         -cumulative_infected, -cumulative_unrecovered,
-         -cumulative_severe, -new_unrecovered) %>%
+  select(-county, 
+         -age_cat, 
+         -race_ethnicity, 
+         -dt_diagnosis) %>%
   group_by(sex) %>%
   summarise(
-    tot_new_infections = sum(new_infections, na.rm = TRUE),
-    tot_new_severe = sum(new_severe, na.rm = TRUE)
+    new_infections_tot = sum(new_infections, na.rm = TRUE),
+    cum_infected_tot = sum(cumulative_infected, na.rm = TRUE),
+    new_severe_tot = sum(new_severe, na.rm = TRUE),
+    cum_severe_tot = sum(cumulative_severe, na.rm = TRUE),
+    new_unrecovered_tot = sum(new_unrecovered, na.rm = TRUE),
+    cum_unrecovered_tot = sum(cumulative_unrecovered, na.rm = TRUE)
   ) %>%
   ungroup() %>%
   bind_rows(
     summarise(., 
       sex = "Total",
-      tot_new_infections = sum(tot_new_infections, na.rm = TRUE),
-      tot_new_severe = sum(tot_new_severe, na.rm = TRUE)
+      new_infections_tot = sum(new_infections_tot, na.rm = TRUE),
+      cum_infected_tot = sum(cum_infected_tot, na.rm = TRUE),
+      new_severe_tot = sum(new_severe_tot, na.rm = TRUE),
+      cum_severe_tot = sum(cum_severe_tot, na.rm = TRUE),
+      new_unrecovered_tot = sum(new_unrecovered_tot, na.rm = TRUE),
+      cum_unrecovered_tot = sum(cum_unrecovered_tot, na.rm = TRUE)
     )
   )
 morbidity_by_sex
@@ -173,64 +187,89 @@ morbidity_by_sex
 
 ```{r}
 morbidity_by_county <- morbidity_all %>%
-  select(-sex, -age_cat, -race_ethnicity, -dt_diagnosis,
-         -cumulative_infected, -cumulative_unrecovered,
-         -cumulative_severe, -new_unrecovered) %>%
+  select(-sex, 
+         -age_cat, 
+         -race_ethnicity, 
+         -dt_diagnosis)%>%
   group_by(county) %>%
   summarise(
-    tot_new_infections = sum(new_infections, na.rm = TRUE),
-    tot_new_severe = sum(new_severe, na.rm = TRUE)
+    new_infections_tot = sum(new_infections, na.rm = TRUE),
+    cum_infected_tot = sum(cumulative_infected, na.rm = TRUE),
+    new_severe_tot = sum(new_severe, na.rm = TRUE),
+    cum_severe_tot = sum(cumulative_severe, na.rm = TRUE),
+    new_unrecovered_tot = sum(new_unrecovered, na.rm = TRUE),
+    cum_unrecovered_tot = sum(cumulative_unrecovered, na.rm = TRUE)
   ) %>%
   ungroup() %>%
   bind_rows(
     summarise(., 
       county = "Total",
-      tot_new_infections = sum(tot_new_infections, na.rm = TRUE),
-      tot_new_severe = sum(tot_new_severe, na.rm = TRUE)
+      new_infections_tot = sum(new_infections_tot, na.rm = TRUE),
+      cum_infected_tot = sum(cum_infected_tot, na.rm = TRUE),
+      new_severe_tot = sum(new_severe_tot, na.rm = TRUE),
+      cum_severe_tot = sum(cum_severe_tot, na.rm = TRUE),
+      new_unrecovered_tot = sum(new_unrecovered_tot, na.rm = TRUE),
+      cum_unrecovered_tot = sum(cum_unrecovered_tot, na.rm = TRUE)
     )
   )
-# I'm going to try a pivot longer on this to see if it look better later (need to feed kids)
 head(morbidity_by_county)
 ```
 
 ```{r}
 morbidity_by_race_ethnicity <- morbidity_all %>%
-  select(-sex, -age_cat, -county, -dt_diagnosis,
-         -cumulative_infected, -cumulative_unrecovered,
-         -cumulative_severe, -new_unrecovered) %>%
+  select(-sex, 
+         -age_cat, 
+         -county, 
+         -dt_diagnosis) %>%
   group_by(race_ethnicity) %>%
   summarise(
-    tot_new_infections = sum(new_infections, na.rm = TRUE),
-    tot_new_severe = sum(new_severe, na.rm = TRUE)
+    new_infections_tot = sum(new_infections, na.rm = TRUE),
+    cum_infected_tot = sum(cumulative_infected, na.rm = TRUE),
+    new_severe_tot = sum(new_severe, na.rm = TRUE),
+    cum_severe_tot = sum(cumulative_severe, na.rm = TRUE),
+    new_unrecovered_tot = sum(new_unrecovered, na.rm = TRUE),
+    cum_unrecovered_tot = sum(cumulative_unrecovered, na.rm = TRUE)
   ) %>%
   ungroup() %>%
   bind_rows(
     summarise(., 
       race_ethnicity = "Total",
-      tot_new_infections = sum(tot_new_infections, na.rm = TRUE),
-      tot_new_severe = sum(tot_new_severe, na.rm = TRUE)
+      new_infections_tot = sum(new_infections_tot, na.rm = TRUE),
+      cum_infected_tot = sum(cum_infected_tot, na.rm = TRUE),
+      new_severe_tot = sum(new_severe_tot, na.rm = TRUE),
+      cum_severe_tot = sum(cum_severe_tot, na.rm = TRUE),
+      new_unrecovered_tot = sum(new_unrecovered_tot, na.rm = TRUE),
+      cum_unrecovered_tot = sum(cum_unrecovered_tot, na.rm = TRUE)
     )
   )
-# We need to do some additional data cleaning on the race/ethnicity groups
 head(morbidity_by_race_ethnicity)
 ```
 
 ```{r}
 morbidity_by_age <- morbidity_all %>%
-  select(-county, -sex, -race_ethnicity, -dt_diagnosis,
-         -cumulative_infected, -cumulative_unrecovered,
-         -cumulative_severe, -new_unrecovered) %>%
+  select(-county, 
+         -sex, 
+         -race_ethnicity, 
+         -dt_diagnosis) %>%
   group_by(age_cat) %>%
   summarise(
-    tot_new_infections = sum(new_infections, na.rm = TRUE),
-    tot_new_severe = sum(new_severe, na.rm = TRUE)
+    new_infections_tot = sum(new_infections, na.rm = TRUE),
+    cum_infected_tot = sum(cumulative_infected, na.rm = TRUE),
+    new_severe_tot = sum(new_severe, na.rm = TRUE),
+    cum_severe_tot = sum(cumulative_severe, na.rm = TRUE),
+    new_unrecovered_tot = sum(new_unrecovered, na.rm = TRUE),
+    cum_unrecovered_tot = sum(cumulative_unrecovered, na.rm = TRUE)
   ) %>%
   ungroup() %>%
   bind_rows(
     summarise(., 
       age_cat = "Total",
-      tot_new_infections = sum(tot_new_infections, na.rm = TRUE),
-      tot_new_severe = sum(tot_new_severe, na.rm = TRUE)
+      new_infections_tot = sum(new_infections_tot, na.rm = TRUE),
+      cum_infected_tot = sum(cum_infected_tot, na.rm = TRUE),
+      new_severe_tot = sum(new_severe_tot, na.rm = TRUE),
+      cum_severe_tot = sum(cum_severe_tot, na.rm = TRUE),
+      new_unrecovered_tot = sum(new_unrecovered_tot, na.rm = TRUE),
+      cum_unrecovered_tot = sum(cum_unrecovered_tot, na.rm = TRUE)
     )
   )
 morbidity_by_age
@@ -261,8 +300,50 @@ ca_pop_clean <- ca_pop %>%
   
   select(county, age_cat, sex, race_ethnicity, population)
 
+#combine 0-17 age froup to match county level data set
+ca_pop_collapsed <- ca_pop_clean %>%
+  mutate(
+    age_cat = case_when(
+      age_cat %in% c("0-4", "5-11", "12-17") ~ "0-17",
+      TRUE ~ age_cat  # keep other categories unchanged
+    )
+  ) %>%
+  group_by(county, sex, race_ethnicity, age_cat) %>%
+  summarise(
+    population = sum(population, na.rm = TRUE),
+    .groups = "drop"
+  )
+```
+
+After cleaning and collapsing the population data set, we realized that we would need to remove the diagnosis date column and collapse the morbidity data set prior to joining with the population data set.
+
+```{r}
+morbidity_collapsed<-morbidity_all%>%
+  select(-dt_diagnosis)%>%
+  group_by(county,sex,race_ethnicity,age_cat)%>%
+  summarise(
+    new_infections = sum(new_infections, na.rm = TRUE),
+    cumulative_infected = sum(cumulative_infected, na.rm = TRUE),
+    new_unrecovered = sum(new_unrecovered, na.rm = TRUE),
+    cumulative_unrecovered = sum(cumulative_unrecovered, na.rm = TRUE),
+    new_severe = sum(new_severe, na.rm = TRUE),
+    cumulative_severe = sum(cumulative_severe, na.rm = TRUE),
+    .groups = "drop"
+  )
+```
+
+We joined the data sets using the full_join() function from dplyr so that all variables would be retained from both data frames. We used the 4 variables shared by both data frames ("county", "sex", "race_ethnicity", and "age_cat") to ensure the rows are matched correctly for joining.
+
+```{r}
+ca_id <- full_join(
+  morbidity_collapsed,
+  ca_pop_collapsed,
+  by = c("county", "sex", "race_ethnicity", "age_cat")
+)
 ```
 
 **Step 2: Select demographic or geographic strata(s) of interest**
+
+Since we selected sex, county, race/ethnicity, and age for the morbidity data set because these are key factors that often influence disease patterns in public health data it seems reasonable to select those for the combined population data set.
 
 **Step 3: Create a rate metric and summarize to include only one row per strata of interest**
