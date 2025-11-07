@@ -178,9 +178,9 @@ Attaching package: 'janitor'</code></pre>
 <p>To prepare the morbidity datasets for analysis, we compared the column names in the California (sim_ca) and Los Angeles (sim_la) files and found several inconsistencies. The same variables were labeled differently across datasets (for example, dt_dx vs.&nbsp;dt_diagnosis, dx_new vs.&nbsp;new_infections). To make them compatible, we created a clear mapping and renamed the LA variables to match the CA format. We also added a county column to the LA data so both files included the same geographic identifier. This standardization step was necessary to allow the two datasets to be combined into one complete morbidity dataset for the state.</p>
 <table class="caption-top table">
 <colgroup>
-<col style="width: 28%">
+<col style="width: 29%">
 <col style="width: 31%">
-<col style="width: 39%">
+<col style="width: 38%">
 </colgroup>
 <thead>
 <tr class="header">
@@ -273,7 +273,8 @@ Attaching package: 'janitor'</code></pre>
 <span id="cb15-18"><a href="#cb15-18" aria-hidden="true" tabindex="-1"></a>    new_severe, cumulative_severe</span>
 <span id="cb15-19"><a href="#cb15-19" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>After aligning the column names, we reviewed the variable values to make sure they were coded consistently across both datasets. Using the project codebook, we recoded the numeric race and ethnicity values in the California dataset into descriptive text labels so they matched the LA County format. We also converted the LA date variable from a SAS-style format (DDMONYYYY) to a standard date format (YYYY-MM-DD).These updates ensured that both datasets use the same categories and formats, which will make it easier to analyze and compare results once they are combined.</p>
+<p>After aligning the column names, we reviewed the variable values to make sure they were coded consistently across both datasets. Using the project codebook, we recoded the numeric race and ethnicity values in the California dataset into descriptive text labels so they matched the LA County format. We also converted the LA date variable from a SAS-style format (DDMONYYYY) to a standard date format (YYYY-MM-DD). These updates ensured that both datasets use the same categories and formats, which will make it easier to analyze and compare results once they are combined.</p>
+<p>When comparing the column headers, we found one additional variable in the California dataset (time_int) that was not present in the Los Angeles County file. This column captured time intervals that were not needed for our current analysis, so we removed it to keep the datasets consistent before merging.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Clean and standardize CA Morbidity values</span></span>
 <span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a></span>
@@ -289,190 +290,533 @@ Attaching package: 'janitor'</code></pre>
 <span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a>      <span class="st">"6"</span> <span class="ot">=</span> <span class="st">"Multiracial (two or more of above races), Non-Hispanic"</span>,</span>
 <span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a>      <span class="st">"7"</span> <span class="ot">=</span> <span class="st">"Hispanic (any race)"</span>,</span>
 <span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a>      <span class="st">"9"</span> <span class="ot">=</span> <span class="st">"Unknown"</span>),</span>
-<span id="cb16-15"><a href="#cb16-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">sex =</span> <span class="fu">str_to_title</span>(<span class="fu">str_trim</span>(sex))</span>
-<span id="cb16-16"><a href="#cb16-16" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb16-17"><a href="#cb16-17" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb16-18"><a href="#cb16-18" aria-hidden="true" tabindex="-1"></a><span class="co"># Clean and standardize LA Morbidity values</span></span>
+<span id="cb16-15"><a href="#cb16-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">sex =</span> <span class="fu">str_to_title</span>(<span class="fu">str_trim</span>(sex)),</span>
+<span id="cb16-16"><a href="#cb16-16" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Remove the word "County" and trim any trailing spaces in county names </span></span>
+<span id="cb16-17"><a href="#cb16-17" aria-hidden="true" tabindex="-1"></a>    <span class="co"># to align with population data set</span></span>
+<span id="cb16-18"><a href="#cb16-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">county =</span> <span class="fu">str_remove</span>(county, <span class="fu">regex</span>(<span class="st">"</span><span class="sc">\\</span><span class="st">s*County$"</span>, <span class="at">ignore_case =</span> <span class="cn">TRUE</span>)) <span class="sc">%&gt;%</span> <span class="fu">str_trim</span>())</span>
 <span id="cb16-19"><a href="#cb16-19" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-20"><a href="#cb16-20" aria-hidden="true" tabindex="-1"></a>sim_la_clean2 <span class="ot">&lt;-</span> sim_la_clean1 <span class="sc">%&gt;%</span></span>
-<span id="cb16-21"><a href="#cb16-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb16-22"><a href="#cb16-22" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb16-23"><a href="#cb16-23" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Convert SAS-style date (e.g., 23OCT2023) to YYYY-MM-DD</span></span>
-<span id="cb16-24"><a href="#cb16-24" aria-hidden="true" tabindex="-1"></a>    <span class="at">dt_diagnosis =</span> <span class="fu">as.Date</span>(dt_diagnosis, <span class="at">format =</span> <span class="st">"%d%b%Y"</span>),</span>
-<span id="cb16-25"><a href="#cb16-25" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb16-26"><a href="#cb16-26" aria-hidden="true" tabindex="-1"></a>    <span class="at">race_ethnicity =</span> <span class="fu">str_trim</span>(race_ethnicity),</span>
+<span id="cb16-20"><a href="#cb16-20" aria-hidden="true" tabindex="-1"></a>sim_ca_clean2 <span class="ot">&lt;-</span> sim_ca_clean1 <span class="sc">%&gt;%</span></span>
+<span id="cb16-21"><a href="#cb16-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>time_int)</span>
+<span id="cb16-22"><a href="#cb16-22" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb16-23"><a href="#cb16-23" aria-hidden="true" tabindex="-1"></a><span class="co"># Clean and standardize LA Morbidity values</span></span>
+<span id="cb16-24"><a href="#cb16-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-25"><a href="#cb16-25" aria-hidden="true" tabindex="-1"></a>sim_la_clean2 <span class="ot">&lt;-</span> sim_la_clean1 <span class="sc">%&gt;%</span></span>
+<span id="cb16-26"><a href="#cb16-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
 <span id="cb16-27"><a href="#cb16-27" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb16-28"><a href="#cb16-28" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Ensure consistent capitalization and remove stray spaces in race/ethnicity</span></span>
-<span id="cb16-29"><a href="#cb16-29" aria-hidden="true" tabindex="-1"></a>    <span class="at">race_ethnicity =</span> <span class="fu">str_trim</span>(race_ethnicity),</span>
-<span id="cb16-30"><a href="#cb16-30" aria-hidden="true" tabindex="-1"></a>    <span class="at">race_ethnicity =</span> <span class="fu">recode</span>(</span>
-<span id="cb16-31"><a href="#cb16-31" aria-hidden="true" tabindex="-1"></a>      race_ethnicity,</span>
-<span id="cb16-32"><a href="#cb16-32" aria-hidden="true" tabindex="-1"></a>      <span class="st">"Hispanic (Any Race)"</span> <span class="ot">=</span> <span class="st">"Hispanic (any race)"</span>,</span>
-<span id="cb16-33"><a href="#cb16-33" aria-hidden="true" tabindex="-1"></a>      <span class="st">"American Indian Or Alaska Native, Non-Hispanic"</span> <span class="ot">=</span> <span class="st">"American Indian or Alaska            Native, Non-Hispanic"</span>, <span class="st">"Native Hawaiian Or Pacific Islander, Non-Hispanic"</span> <span class="ot">=</span>           <span class="st">"Native Hawaiian or Pacific Islander, Non-Hispanic"</span>, <span class="st">"Multiracial (Two Or More Of        Above Races), Non-Hispanic"</span> <span class="ot">=</span> <span class="st">"Multiracial (two or more of above races), Non            -Hispanic"</span>),</span>
-<span id="cb16-34"><a href="#cb16-34" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb16-35"><a href="#cb16-35" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Clean capitalization for sex variable</span></span>
-<span id="cb16-36"><a href="#cb16-36" aria-hidden="true" tabindex="-1"></a>    <span class="at">sex =</span> <span class="fu">str_to_title</span>(sex))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<p>When comparing the column headers, we found one additional variable in the California dataset that was not present in the Los Angeles County file. This column captured time intervals that were not needed for our current analysis, so we removed it to keep the datasets consistent before merging. Step 2: Combine morbidity datasets into a single dataset</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>sim_ca_clean2 <span class="ot">&lt;-</span> sim_ca_clean1 <span class="sc">%&gt;%</span></span>
-<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>time_int)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb16-28"><a href="#cb16-28" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Convert SAS-style date (e.g., 23OCT2023) to YYYY-MM-DD</span></span>
+<span id="cb16-29"><a href="#cb16-29" aria-hidden="true" tabindex="-1"></a>    <span class="at">dt_diagnosis =</span> <span class="fu">as.Date</span>(dt_diagnosis, <span class="at">format =</span> <span class="st">"%d%b%Y"</span>),</span>
+<span id="cb16-30"><a href="#cb16-30" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb16-31"><a href="#cb16-31" aria-hidden="true" tabindex="-1"></a>    <span class="at">race_ethnicity =</span> <span class="fu">str_trim</span>(race_ethnicity),</span>
+<span id="cb16-32"><a href="#cb16-32" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb16-33"><a href="#cb16-33" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Ensure consistent capitalization and remove stray spaces in race/ethnicity</span></span>
+<span id="cb16-34"><a href="#cb16-34" aria-hidden="true" tabindex="-1"></a>    <span class="at">race_ethnicity =</span> <span class="fu">str_trim</span>(race_ethnicity),</span>
+<span id="cb16-35"><a href="#cb16-35" aria-hidden="true" tabindex="-1"></a>    <span class="at">race_ethnicity =</span> <span class="fu">recode</span>(</span>
+<span id="cb16-36"><a href="#cb16-36" aria-hidden="true" tabindex="-1"></a>      race_ethnicity,</span>
+<span id="cb16-37"><a href="#cb16-37" aria-hidden="true" tabindex="-1"></a>      <span class="st">"Hispanic (Any Race)"</span> <span class="ot">=</span> <span class="st">"Hispanic (any race)"</span>,</span>
+<span id="cb16-38"><a href="#cb16-38" aria-hidden="true" tabindex="-1"></a>      <span class="st">"American Indian Or Alaska Native, Non-Hispanic"</span> <span class="ot">=</span> </span>
+<span id="cb16-39"><a href="#cb16-39" aria-hidden="true" tabindex="-1"></a>      <span class="st">"American Indian or Alaska Native, Non-Hispanic"</span>, </span>
+<span id="cb16-40"><a href="#cb16-40" aria-hidden="true" tabindex="-1"></a>      <span class="st">"Native Hawaiian Or Pacific Islander, Non-Hispanic"</span> <span class="ot">=</span> </span>
+<span id="cb16-41"><a href="#cb16-41" aria-hidden="true" tabindex="-1"></a>      <span class="st">"Native Hawaiian or Pacific Islander, Non-Hispanic"</span>, </span>
+<span id="cb16-42"><a href="#cb16-42" aria-hidden="true" tabindex="-1"></a>      <span class="st">"Multiracial (Two Or More Of Above Races), Non-Hispanic"</span> <span class="ot">=</span></span>
+<span id="cb16-43"><a href="#cb16-43" aria-hidden="true" tabindex="-1"></a>      <span class="st">"Multiracial (two or more of above races), Non-Hispanic"</span>),</span>
+<span id="cb16-44"><a href="#cb16-44" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb16-45"><a href="#cb16-45" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Clean capitalization for sex variable</span></span>
+<span id="cb16-46"><a href="#cb16-46" aria-hidden="true" tabindex="-1"></a>    <span class="at">sex =</span> <span class="fu">str_to_title</span>(sex),</span>
+<span id="cb16-47"><a href="#cb16-47" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb16-48"><a href="#cb16-48" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Remove the word "County" and trim any trailing spaces in county names </span></span>
+<span id="cb16-49"><a href="#cb16-49" aria-hidden="true" tabindex="-1"></a>    <span class="co"># to align with population data set</span></span>
+<span id="cb16-50"><a href="#cb16-50" aria-hidden="true" tabindex="-1"></a>    <span class="at">county =</span> <span class="fu">str_remove</span>(county, <span class="fu">regex</span>(<span class="st">"</span><span class="sc">\\</span><span class="st">s*County$"</span>, <span class="at">ignore_case =</span> <span class="cn">TRUE</span>)) <span class="sc">%&gt;%</span> <span class="fu">str_trim</span>()</span>
+<span id="cb16-51"><a href="#cb16-51" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p><strong>Step 2: Combine morbidity datasets into a single dataset</strong></p>
-<p>Now that both morbidity files used the same variable names and value formats, we combined them into one dataset using the bind_rows() function. This step let us put the statewide California records and the Los Angeles County records together in a single file so we can analyze all reported cases at once.</p>
+<p>Now that both morbidity files used the same variable names and value formats, we combined them into one dataset using the bind_rows() function. This step let us put the statewide California records and the Los Angeles County records together in a single file so we can analyze all reported cases at once. The resulting combined dataset, saved as morbidity_all, includes all California and Los Angeles County record and will be used for aggregation and descriptive analyses in the following steps.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>morbidity_all <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(sim_ca_clean2, sim_la_clean2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>morbidity_all <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(sim_ca_clean2, sim_la_clean2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p><strong>Step 3: Select demographic and geographic strata (s) of interest</strong></p>
-<p>For the next step, we identified the demographic and geographic strata we want to analyze. The dataset includes several variables that describe population subgroups, such as county, age group, sex, and race/ethnicity. For this analysis, we will focus on differences by ????????, since these are key factors that often influence disease patterns in public health data.</p>
+<p>For the next step, we identified the demographic and geographic strata we want to analyze. The dataset includes several variables that describe population subgroups, such as county, age group, sex, and race/ethnicity. For this analysis, we will focus on differences by sex, county, race/ethnicity, and age, since these are key factors that often influence disease patterns in public health data.</p>
 <p><strong>Step 4: Aggregate the data into a new dataframe to include only one row per strata of interest</strong></p>
+<p>Using the strata we identified in Step 3 (sex, county, race/ethnicity, and age group), we created separate summary tables so that each table contains one row per stratum and the total counts of morbidity measures.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>morbidity_by_sex <span class="ot">&lt;-</span> morbidity_all <span class="sc">%&gt;%</span></span>
-<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>county, <span class="sc">-</span>age_cat, <span class="sc">-</span>race_ethnicity, <span class="sc">-</span>dt_diagnosis,</span>
-<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>         <span class="sc">-</span>cumulative_infected, <span class="sc">-</span>cumulative_unrecovered,</span>
-<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>         <span class="sc">-</span>cumulative_severe, <span class="sc">-</span>new_unrecovered) <span class="sc">%&gt;%</span></span>
-<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(sex) <span class="sc">%&gt;%</span></span>
-<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
-<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">tot_new_infections =</span> <span class="fu">sum</span>(new_infections, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
-<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">tot_new_severe =</span> <span class="fu">sum</span>(new_severe, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
-<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bind_rows</span>(</span>
-<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">summarise</span>(., </span>
-<span id="cb19-13"><a href="#cb19-13" aria-hidden="true" tabindex="-1"></a>      <span class="at">sex =</span> <span class="st">"Total"</span>,</span>
-<span id="cb19-14"><a href="#cb19-14" aria-hidden="true" tabindex="-1"></a>      <span class="at">tot_new_infections =</span> <span class="fu">sum</span>(tot_new_infections, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
-<span id="cb19-15"><a href="#cb19-15" aria-hidden="true" tabindex="-1"></a>      <span class="at">tot_new_severe =</span> <span class="fu">sum</span>(tot_new_severe, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb19-16"><a href="#cb19-16" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb19-17"><a href="#cb19-17" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb19-18"><a href="#cb19-18" aria-hidden="true" tabindex="-1"></a>morbidity_by_sex</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>morbidity_by_sex <span class="ot">&lt;-</span> morbidity_all <span class="sc">%&gt;%</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>county, </span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>         <span class="sc">-</span>age_cat, </span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>         <span class="sc">-</span>race_ethnicity, </span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>         <span class="sc">-</span>dt_diagnosis) <span class="sc">%&gt;%</span></span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(sex) <span class="sc">%&gt;%</span></span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">new_infections_tot =</span> <span class="fu">sum</span>(new_infections, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">cum_infected_tot =</span> <span class="fu">sum</span>(cumulative_infected, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">new_severe_tot =</span> <span class="fu">sum</span>(new_severe, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">cum_severe_tot =</span> <span class="fu">sum</span>(cumulative_severe, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">new_unrecovered_tot =</span> <span class="fu">sum</span>(new_unrecovered, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb18-13"><a href="#cb18-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">cum_unrecovered_tot =</span> <span class="fu">sum</span>(cumulative_unrecovered, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb18-14"><a href="#cb18-14" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb18-15"><a href="#cb18-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb18-16"><a href="#cb18-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bind_rows</span>(</span>
+<span id="cb18-17"><a href="#cb18-17" aria-hidden="true" tabindex="-1"></a>    <span class="fu">summarise</span>(., </span>
+<span id="cb18-18"><a href="#cb18-18" aria-hidden="true" tabindex="-1"></a>      <span class="at">sex =</span> <span class="st">"Total"</span>,</span>
+<span id="cb18-19"><a href="#cb18-19" aria-hidden="true" tabindex="-1"></a>      <span class="at">new_infections_tot =</span> <span class="fu">sum</span>(new_infections_tot, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb18-20"><a href="#cb18-20" aria-hidden="true" tabindex="-1"></a>      <span class="at">cum_infected_tot =</span> <span class="fu">sum</span>(cum_infected_tot, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb18-21"><a href="#cb18-21" aria-hidden="true" tabindex="-1"></a>      <span class="at">new_severe_tot =</span> <span class="fu">sum</span>(new_severe_tot, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb18-22"><a href="#cb18-22" aria-hidden="true" tabindex="-1"></a>      <span class="at">cum_severe_tot =</span> <span class="fu">sum</span>(cum_severe_tot, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb18-23"><a href="#cb18-23" aria-hidden="true" tabindex="-1"></a>      <span class="at">new_unrecovered_tot =</span> <span class="fu">sum</span>(new_unrecovered_tot, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb18-24"><a href="#cb18-24" aria-hidden="true" tabindex="-1"></a>      <span class="at">cum_unrecovered_tot =</span> <span class="fu">sum</span>(cum_unrecovered_tot, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb18-25"><a href="#cb18-25" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb18-26"><a href="#cb18-26" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb18-27"><a href="#cb18-27" aria-hidden="true" tabindex="-1"></a>morbidity_by_sex</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 3 × 3
-  sex    tot_new_infections tot_new_severe
-  &lt;chr&gt;               &lt;dbl&gt;          &lt;dbl&gt;
-1 Female            2294166          67371
-2 Male              2255417          59555
-3 Total             4549583         126926</code></pre>
-</div>
-</div>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>morbidity_by_county <span class="ot">&lt;-</span> morbidity_all <span class="sc">%&gt;%</span></span>
-<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>sex, <span class="sc">-</span>age_cat, <span class="sc">-</span>race_ethnicity, <span class="sc">-</span>dt_diagnosis,</span>
-<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>         <span class="sc">-</span>cumulative_infected, <span class="sc">-</span>cumulative_unrecovered,</span>
-<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>         <span class="sc">-</span>cumulative_severe, <span class="sc">-</span>new_unrecovered) <span class="sc">%&gt;%</span></span>
-<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(county) <span class="sc">%&gt;%</span></span>
-<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
-<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">tot_new_infections =</span> <span class="fu">sum</span>(new_infections, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
-<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">tot_new_severe =</span> <span class="fu">sum</span>(new_severe, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
-<span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb21-11"><a href="#cb21-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bind_rows</span>(</span>
-<span id="cb21-12"><a href="#cb21-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">summarise</span>(., </span>
-<span id="cb21-13"><a href="#cb21-13" aria-hidden="true" tabindex="-1"></a>      <span class="at">county =</span> <span class="st">"Total"</span>,</span>
-<span id="cb21-14"><a href="#cb21-14" aria-hidden="true" tabindex="-1"></a>      <span class="at">tot_new_infections =</span> <span class="fu">sum</span>(tot_new_infections, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
-<span id="cb21-15"><a href="#cb21-15" aria-hidden="true" tabindex="-1"></a>      <span class="at">tot_new_severe =</span> <span class="fu">sum</span>(tot_new_severe, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb21-16"><a href="#cb21-16" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb21-17"><a href="#cb21-17" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb21-18"><a href="#cb21-18" aria-hidden="true" tabindex="-1"></a><span class="co"># I'm going to try a pivot longer on this to see if it look better later (need to feed kids)</span></span>
-<span id="cb21-19"><a href="#cb21-19" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(morbidity_by_county)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 6 × 3
-  county           tot_new_infections tot_new_severe
-  &lt;chr&gt;                         &lt;dbl&gt;          &lt;dbl&gt;
-1 Alameda County               149041           4141
-2 Alpine County                   128              4
-3 Amador County                  3531            140
-4 Butte County                  20841            684
-5 Calaveras County               4676            200
-6 Colusa County                  4627            135</code></pre>
+<pre><code># A tibble: 3 × 7
+  sex    new_infections_tot cum_infected_tot new_severe_tot cum_severe_tot
+  &lt;chr&gt;               &lt;dbl&gt;            &lt;dbl&gt;          &lt;dbl&gt;          &lt;dbl&gt;
+1 Female            2294166         36183759          67371         913008
+2 Male              2255417         35550318          59555         807286
+3 Total             4549583         71734077         126926        1720294
+# ℹ 2 more variables: new_unrecovered_tot &lt;dbl&gt;, cum_unrecovered_tot &lt;dbl&gt;</code></pre>
 </div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>morbidity_by_race_ethnicity <span class="ot">&lt;-</span> morbidity_all <span class="sc">%&gt;%</span></span>
-<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>sex, <span class="sc">-</span>age_cat, <span class="sc">-</span>county, <span class="sc">-</span>dt_diagnosis,</span>
-<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>         <span class="sc">-</span>cumulative_infected, <span class="sc">-</span>cumulative_unrecovered,</span>
-<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>         <span class="sc">-</span>cumulative_severe, <span class="sc">-</span>new_unrecovered) <span class="sc">%&gt;%</span></span>
-<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(race_ethnicity) <span class="sc">%&gt;%</span></span>
-<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
-<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">tot_new_infections =</span> <span class="fu">sum</span>(new_infections, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
-<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">tot_new_severe =</span> <span class="fu">sum</span>(new_severe, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
-<span id="cb23-10"><a href="#cb23-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb23-11"><a href="#cb23-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bind_rows</span>(</span>
-<span id="cb23-12"><a href="#cb23-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">summarise</span>(., </span>
-<span id="cb23-13"><a href="#cb23-13" aria-hidden="true" tabindex="-1"></a>      <span class="at">race_ethnicity =</span> <span class="st">"Total"</span>,</span>
-<span id="cb23-14"><a href="#cb23-14" aria-hidden="true" tabindex="-1"></a>      <span class="at">tot_new_infections =</span> <span class="fu">sum</span>(tot_new_infections, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
-<span id="cb23-15"><a href="#cb23-15" aria-hidden="true" tabindex="-1"></a>      <span class="at">tot_new_severe =</span> <span class="fu">sum</span>(tot_new_severe, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb23-16"><a href="#cb23-16" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb23-17"><a href="#cb23-17" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb23-18"><a href="#cb23-18" aria-hidden="true" tabindex="-1"></a><span class="co"># We need to do some additional data cleaning on the race/ethnicity groups</span></span>
-<span id="cb23-19"><a href="#cb23-19" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(morbidity_by_race_ethnicity)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>morbidity_by_county <span class="ot">&lt;-</span> morbidity_all <span class="sc">%&gt;%</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>sex, </span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>         <span class="sc">-</span>age_cat, </span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>         <span class="sc">-</span>race_ethnicity, </span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>         <span class="sc">-</span>dt_diagnosis)<span class="sc">%&gt;%</span></span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(county) <span class="sc">%&gt;%</span></span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">new_infections_tot =</span> <span class="fu">sum</span>(new_infections, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">cum_infected_tot =</span> <span class="fu">sum</span>(cumulative_infected, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">new_severe_tot =</span> <span class="fu">sum</span>(new_severe, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">cum_severe_tot =</span> <span class="fu">sum</span>(cumulative_severe, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb20-12"><a href="#cb20-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">new_unrecovered_tot =</span> <span class="fu">sum</span>(new_unrecovered, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb20-13"><a href="#cb20-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">cum_unrecovered_tot =</span> <span class="fu">sum</span>(cumulative_unrecovered, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb20-14"><a href="#cb20-14" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb20-15"><a href="#cb20-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb20-16"><a href="#cb20-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bind_rows</span>(</span>
+<span id="cb20-17"><a href="#cb20-17" aria-hidden="true" tabindex="-1"></a>    <span class="fu">summarise</span>(., </span>
+<span id="cb20-18"><a href="#cb20-18" aria-hidden="true" tabindex="-1"></a>      <span class="at">county =</span> <span class="st">"Total"</span>,</span>
+<span id="cb20-19"><a href="#cb20-19" aria-hidden="true" tabindex="-1"></a>      <span class="at">new_infections_tot =</span> <span class="fu">sum</span>(new_infections_tot, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb20-20"><a href="#cb20-20" aria-hidden="true" tabindex="-1"></a>      <span class="at">cum_infected_tot =</span> <span class="fu">sum</span>(cum_infected_tot, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb20-21"><a href="#cb20-21" aria-hidden="true" tabindex="-1"></a>      <span class="at">new_severe_tot =</span> <span class="fu">sum</span>(new_severe_tot, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb20-22"><a href="#cb20-22" aria-hidden="true" tabindex="-1"></a>      <span class="at">cum_severe_tot =</span> <span class="fu">sum</span>(cum_severe_tot, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb20-23"><a href="#cb20-23" aria-hidden="true" tabindex="-1"></a>      <span class="at">new_unrecovered_tot =</span> <span class="fu">sum</span>(new_unrecovered_tot, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb20-24"><a href="#cb20-24" aria-hidden="true" tabindex="-1"></a>      <span class="at">cum_unrecovered_tot =</span> <span class="fu">sum</span>(cum_unrecovered_tot, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb20-25"><a href="#cb20-25" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb20-26"><a href="#cb20-26" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb20-27"><a href="#cb20-27" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(morbidity_by_county)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 6 × 3
-  race_ethnicity                               tot_new_infections tot_new_severe
-  &lt;chr&gt;                                                     &lt;dbl&gt;          &lt;dbl&gt;
-1 American Indian or Alaska Native, Non-Hispa…              22195            671
-2 Asian, Non-Hispanic                                      546770          16568
-3 Black, Non-Hispanic                                      271836           7118
-4 Hispanic (any race)                                     1796696          36484
-5 Multiracial (two or more of above races), N…             116391           2227
-6 Native Hawaiian or Pacific Islander, Non-Hi…              16921            410</code></pre>
+<pre><code># A tibble: 6 × 7
+  county    new_infections_tot cum_infected_tot new_severe_tot cum_severe_tot
+  &lt;chr&gt;                  &lt;dbl&gt;            &lt;dbl&gt;          &lt;dbl&gt;          &lt;dbl&gt;
+1 Alameda               149041          2333100           4141          55775
+2 Alpine                   128             2061              4             41
+3 Amador                  3531            55362            140           1913
+4 Butte                  20841           326958            684           9359
+5 Calaveras               4676            73236            200           2586
+6 Colusa                  4627            73468            135           1830
+# ℹ 2 more variables: new_unrecovered_tot &lt;dbl&gt;, cum_unrecovered_tot &lt;dbl&gt;</code></pre>
 </div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>morbidity_by_age <span class="ot">&lt;-</span> morbidity_all <span class="sc">%&gt;%</span></span>
-<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>county, <span class="sc">-</span>sex, <span class="sc">-</span>race_ethnicity, <span class="sc">-</span>dt_diagnosis,</span>
-<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>         <span class="sc">-</span>cumulative_infected, <span class="sc">-</span>cumulative_unrecovered,</span>
-<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>         <span class="sc">-</span>cumulative_severe, <span class="sc">-</span>new_unrecovered) <span class="sc">%&gt;%</span></span>
-<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(age_cat) <span class="sc">%&gt;%</span></span>
-<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
-<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">tot_new_infections =</span> <span class="fu">sum</span>(new_infections, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
-<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">tot_new_severe =</span> <span class="fu">sum</span>(new_severe, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb25-9"><a href="#cb25-9" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
-<span id="cb25-10"><a href="#cb25-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb25-11"><a href="#cb25-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bind_rows</span>(</span>
-<span id="cb25-12"><a href="#cb25-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">summarise</span>(., </span>
-<span id="cb25-13"><a href="#cb25-13" aria-hidden="true" tabindex="-1"></a>      <span class="at">age_cat =</span> <span class="st">"Total"</span>,</span>
-<span id="cb25-14"><a href="#cb25-14" aria-hidden="true" tabindex="-1"></a>      <span class="at">tot_new_infections =</span> <span class="fu">sum</span>(tot_new_infections, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
-<span id="cb25-15"><a href="#cb25-15" aria-hidden="true" tabindex="-1"></a>      <span class="at">tot_new_severe =</span> <span class="fu">sum</span>(tot_new_severe, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb25-16"><a href="#cb25-16" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb25-17"><a href="#cb25-17" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb25-18"><a href="#cb25-18" aria-hidden="true" tabindex="-1"></a>morbidity_by_age</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>morbidity_by_race_ethnicity <span class="ot">&lt;-</span> morbidity_all <span class="sc">%&gt;%</span></span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>sex, </span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>         <span class="sc">-</span>age_cat, </span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>         <span class="sc">-</span>county, </span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>         <span class="sc">-</span>dt_diagnosis) <span class="sc">%&gt;%</span></span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(race_ethnicity) <span class="sc">%&gt;%</span></span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">new_infections_tot =</span> <span class="fu">sum</span>(new_infections, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">cum_infected_tot =</span> <span class="fu">sum</span>(cumulative_infected, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb22-10"><a href="#cb22-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">new_severe_tot =</span> <span class="fu">sum</span>(new_severe, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb22-11"><a href="#cb22-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">cum_severe_tot =</span> <span class="fu">sum</span>(cumulative_severe, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb22-12"><a href="#cb22-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">new_unrecovered_tot =</span> <span class="fu">sum</span>(new_unrecovered, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb22-13"><a href="#cb22-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">cum_unrecovered_tot =</span> <span class="fu">sum</span>(cumulative_unrecovered, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb22-14"><a href="#cb22-14" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb22-15"><a href="#cb22-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb22-16"><a href="#cb22-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bind_rows</span>(</span>
+<span id="cb22-17"><a href="#cb22-17" aria-hidden="true" tabindex="-1"></a>    <span class="fu">summarise</span>(., </span>
+<span id="cb22-18"><a href="#cb22-18" aria-hidden="true" tabindex="-1"></a>      <span class="at">race_ethnicity =</span> <span class="st">"Total"</span>,</span>
+<span id="cb22-19"><a href="#cb22-19" aria-hidden="true" tabindex="-1"></a>      <span class="at">new_infections_tot =</span> <span class="fu">sum</span>(new_infections_tot, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb22-20"><a href="#cb22-20" aria-hidden="true" tabindex="-1"></a>      <span class="at">cum_infected_tot =</span> <span class="fu">sum</span>(cum_infected_tot, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb22-21"><a href="#cb22-21" aria-hidden="true" tabindex="-1"></a>      <span class="at">new_severe_tot =</span> <span class="fu">sum</span>(new_severe_tot, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb22-22"><a href="#cb22-22" aria-hidden="true" tabindex="-1"></a>      <span class="at">cum_severe_tot =</span> <span class="fu">sum</span>(cum_severe_tot, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb22-23"><a href="#cb22-23" aria-hidden="true" tabindex="-1"></a>      <span class="at">new_unrecovered_tot =</span> <span class="fu">sum</span>(new_unrecovered_tot, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb22-24"><a href="#cb22-24" aria-hidden="true" tabindex="-1"></a>      <span class="at">cum_unrecovered_tot =</span> <span class="fu">sum</span>(cum_unrecovered_tot, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb22-25"><a href="#cb22-25" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb22-26"><a href="#cb22-26" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb22-27"><a href="#cb22-27" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(morbidity_by_race_ethnicity)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 5 × 3
-  age_cat tot_new_infections tot_new_severe
-  &lt;chr&gt;                &lt;dbl&gt;          &lt;dbl&gt;
-1 0-17                353210            363
-2 18-49              2467284          29325
-3 50-64               540481           2822
-4 65+                1188608          94416
-5 Total              4549583         126926</code></pre>
+<pre><code># A tibble: 6 × 7
+  race_ethnicity              new_infections_tot cum_infected_tot new_severe_tot
+  &lt;chr&gt;                                    &lt;dbl&gt;            &lt;dbl&gt;          &lt;dbl&gt;
+1 American Indian or Alaska …              22195           351136            671
+2 Asian, Non-Hispanic                     546770          8599883          16568
+3 Black, Non-Hispanic                     271836          4286482           7118
+4 Hispanic (any race)                    1796696         28358862          36484
+5 Multiracial (two or more o…             116391          1832578           2227
+6 Native Hawaiian or Pacific…              16921           266818            410
+# ℹ 3 more variables: cum_severe_tot &lt;dbl&gt;, new_unrecovered_tot &lt;dbl&gt;,
+#   cum_unrecovered_tot &lt;dbl&gt;</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>morbidity_by_age <span class="ot">&lt;-</span> morbidity_all <span class="sc">%&gt;%</span></span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>county, </span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>         <span class="sc">-</span>sex, </span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>         <span class="sc">-</span>race_ethnicity, </span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>         <span class="sc">-</span>dt_diagnosis) <span class="sc">%&gt;%</span></span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(age_cat) <span class="sc">%&gt;%</span></span>
+<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">new_infections_tot =</span> <span class="fu">sum</span>(new_infections, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb24-9"><a href="#cb24-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">cum_infected_tot =</span> <span class="fu">sum</span>(cumulative_infected, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb24-10"><a href="#cb24-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">new_severe_tot =</span> <span class="fu">sum</span>(new_severe, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb24-11"><a href="#cb24-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">cum_severe_tot =</span> <span class="fu">sum</span>(cumulative_severe, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb24-12"><a href="#cb24-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">new_unrecovered_tot =</span> <span class="fu">sum</span>(new_unrecovered, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb24-13"><a href="#cb24-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">cum_unrecovered_tot =</span> <span class="fu">sum</span>(cumulative_unrecovered, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb24-14"><a href="#cb24-14" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb24-15"><a href="#cb24-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb24-16"><a href="#cb24-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bind_rows</span>(</span>
+<span id="cb24-17"><a href="#cb24-17" aria-hidden="true" tabindex="-1"></a>    <span class="fu">summarise</span>(., </span>
+<span id="cb24-18"><a href="#cb24-18" aria-hidden="true" tabindex="-1"></a>      <span class="at">age_cat =</span> <span class="st">"Total"</span>,</span>
+<span id="cb24-19"><a href="#cb24-19" aria-hidden="true" tabindex="-1"></a>      <span class="at">new_infections_tot =</span> <span class="fu">sum</span>(new_infections_tot, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb24-20"><a href="#cb24-20" aria-hidden="true" tabindex="-1"></a>      <span class="at">cum_infected_tot =</span> <span class="fu">sum</span>(cum_infected_tot, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb24-21"><a href="#cb24-21" aria-hidden="true" tabindex="-1"></a>      <span class="at">new_severe_tot =</span> <span class="fu">sum</span>(new_severe_tot, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb24-22"><a href="#cb24-22" aria-hidden="true" tabindex="-1"></a>      <span class="at">cum_severe_tot =</span> <span class="fu">sum</span>(cum_severe_tot, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb24-23"><a href="#cb24-23" aria-hidden="true" tabindex="-1"></a>      <span class="at">new_unrecovered_tot =</span> <span class="fu">sum</span>(new_unrecovered_tot, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb24-24"><a href="#cb24-24" aria-hidden="true" tabindex="-1"></a>      <span class="at">cum_unrecovered_tot =</span> <span class="fu">sum</span>(cum_unrecovered_tot, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb24-25"><a href="#cb24-25" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb24-26"><a href="#cb24-26" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb24-27"><a href="#cb24-27" aria-hidden="true" tabindex="-1"></a>morbidity_by_age</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 5 × 7
+  age_cat new_infections_tot cum_infected_tot new_severe_tot cum_severe_tot
+  &lt;chr&gt;                &lt;dbl&gt;            &lt;dbl&gt;          &lt;dbl&gt;          &lt;dbl&gt;
+1 0-17                353210          5510070            363           5028
+2 18-49              2467284         38949332          29325         402563
+3 50-64               540481          8454236           2822          38157
+4 65+                1188608         18820439          94416        1274546
+5 Total              4549583         71734077         126926        1720294
+# ℹ 2 more variables: new_unrecovered_tot &lt;dbl&gt;, cum_unrecovered_tot &lt;dbl&gt;</code></pre>
 </div>
 </div>
 </section>
 <section id="population-dataset" class="level2">
 <h2 class="anchored" data-anchor-id="population-dataset">Population dataset</h2>
 <p><strong>Step 1: Recode values to be consistent with morbidity datasets so they can be joined</strong></p>
+<p>We recoded and reformatted variables in the 2023 California population dataset so that county, sex, race/ethnicity, and age category matched the cleaned morbidity dataset. This ensures a successful join on shared keys.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>ca_pop_clean <span class="ot">&lt;-</span> ca_pop <span class="sc">%&gt;%</span></span>
-<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">clean_names</span>() <span class="sc">%&gt;%</span>   </span>
-<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">population =</span> pop) <span class="sc">%&gt;%</span></span>
-<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">race_ethnicity =</span> <span class="fu">recode</span>(</span>
-<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a>      race7,</span>
-<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a>      <span class="st">"WhiteTE NH"</span> <span class="ot">=</span> <span class="st">"White, Non-Hispanic"</span>,   </span>
-<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a>      <span class="st">"Black NH"</span>   <span class="ot">=</span> <span class="st">"Black, Non-Hispanic"</span>,</span>
-<span id="cb27-9"><a href="#cb27-9" aria-hidden="true" tabindex="-1"></a>      <span class="st">"AIAN NH"</span>    <span class="ot">=</span> <span class="st">"American Indian or Alaska Native, Non-Hispanic"</span>,</span>
-<span id="cb27-10"><a href="#cb27-10" aria-hidden="true" tabindex="-1"></a>      <span class="st">"Asian NH"</span>   <span class="ot">=</span> <span class="st">"Asian, Non-Hispanic"</span>,</span>
-<span id="cb27-11"><a href="#cb27-11" aria-hidden="true" tabindex="-1"></a>      <span class="st">"NHPI NH"</span>    <span class="ot">=</span> <span class="st">"Native Hawaiian or Pacific Islander, Non-Hispanic"</span>,</span>
-<span id="cb27-12"><a href="#cb27-12" aria-hidden="true" tabindex="-1"></a>      <span class="st">"MR NH"</span>      <span class="ot">=</span> <span class="st">"Multiracial (two or more of above races), Non-Hispanic"</span>,</span>
-<span id="cb27-13"><a href="#cb27-13" aria-hidden="true" tabindex="-1"></a>      <span class="st">"Hispanic"</span>   <span class="ot">=</span> <span class="st">"Hispanic (any race)"</span>),</span>
-<span id="cb27-14"><a href="#cb27-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">sex    =</span> <span class="fu">str_to_title</span>(sex),      <span class="co"># FEMALE → Female</span></span>
-<span id="cb27-15"><a href="#cb27-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">county =</span> <span class="fu">str_to_title</span>(county)    <span class="co"># ALAMEDA COUNTY → Alameda County</span></span>
-<span id="cb27-16"><a href="#cb27-16" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
-<span id="cb27-17"><a href="#cb27-17" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb27-18"><a href="#cb27-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(county, age_cat, sex, race_ethnicity, population)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>ca_pop_clean <span class="ot">&lt;-</span> ca_pop <span class="sc">%&gt;%</span></span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">clean_names</span>() <span class="sc">%&gt;%</span>   </span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">population =</span> pop) <span class="sc">%&gt;%</span></span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">race_ethnicity =</span> <span class="fu">recode</span>(</span>
+<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a>      race7,</span>
+<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a>      <span class="st">"WhiteTE NH"</span> <span class="ot">=</span> <span class="st">"White, Non-Hispanic"</span>,   </span>
+<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a>      <span class="st">"Black NH"</span>   <span class="ot">=</span> <span class="st">"Black, Non-Hispanic"</span>,</span>
+<span id="cb26-9"><a href="#cb26-9" aria-hidden="true" tabindex="-1"></a>      <span class="st">"AIAN NH"</span>    <span class="ot">=</span> <span class="st">"American Indian or Alaska Native, Non-Hispanic"</span>,</span>
+<span id="cb26-10"><a href="#cb26-10" aria-hidden="true" tabindex="-1"></a>      <span class="st">"Asian NH"</span>   <span class="ot">=</span> <span class="st">"Asian, Non-Hispanic"</span>,</span>
+<span id="cb26-11"><a href="#cb26-11" aria-hidden="true" tabindex="-1"></a>      <span class="st">"NHPI NH"</span>    <span class="ot">=</span> <span class="st">"Native Hawaiian or Pacific Islander, Non-Hispanic"</span>,</span>
+<span id="cb26-12"><a href="#cb26-12" aria-hidden="true" tabindex="-1"></a>      <span class="st">"MR NH"</span>      <span class="ot">=</span> <span class="st">"Multiracial (two or more of above races), Non-Hispanic"</span>,</span>
+<span id="cb26-13"><a href="#cb26-13" aria-hidden="true" tabindex="-1"></a>      <span class="st">"Hispanic"</span>   <span class="ot">=</span> <span class="st">"Hispanic (any race)"</span>),</span>
+<span id="cb26-14"><a href="#cb26-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">sex    =</span> <span class="fu">str_to_title</span>(sex),      <span class="co"># FEMALE → Female</span></span>
+<span id="cb26-15"><a href="#cb26-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">county =</span> <span class="fu">str_to_title</span>(county)    <span class="co"># ALAMEDA COUNTY → Alameda County</span></span>
+<span id="cb26-16"><a href="#cb26-16" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb26-17"><a href="#cb26-17" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb26-18"><a href="#cb26-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(county, age_cat, sex, race_ethnicity, population)</span>
+<span id="cb26-19"><a href="#cb26-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-20"><a href="#cb26-20" aria-hidden="true" tabindex="-1"></a><span class="co">#combine 0-17 age froup to match county level data set</span></span>
+<span id="cb26-21"><a href="#cb26-21" aria-hidden="true" tabindex="-1"></a>ca_pop_collapsed <span class="ot">&lt;-</span> ca_pop_clean <span class="sc">%&gt;%</span></span>
+<span id="cb26-22"><a href="#cb26-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb26-23"><a href="#cb26-23" aria-hidden="true" tabindex="-1"></a>    <span class="at">age_cat =</span> <span class="fu">case_when</span>(</span>
+<span id="cb26-24"><a href="#cb26-24" aria-hidden="true" tabindex="-1"></a>      age_cat <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"0-4"</span>, <span class="st">"5-11"</span>, <span class="st">"12-17"</span>) <span class="sc">~</span> <span class="st">"0-17"</span>,</span>
+<span id="cb26-25"><a href="#cb26-25" aria-hidden="true" tabindex="-1"></a>      <span class="cn">TRUE</span> <span class="sc">~</span> age_cat  <span class="co"># keep other categories unchanged</span></span>
+<span id="cb26-26"><a href="#cb26-26" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb26-27"><a href="#cb26-27" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb26-28"><a href="#cb26-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(county, sex, race_ethnicity, age_cat) <span class="sc">%&gt;%</span></span>
+<span id="cb26-29"><a href="#cb26-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb26-30"><a href="#cb26-30" aria-hidden="true" tabindex="-1"></a>    <span class="at">population =</span> <span class="fu">sum</span>(population, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb26-31"><a href="#cb26-31" aria-hidden="true" tabindex="-1"></a>    <span class="at">.groups =</span> <span class="st">"drop"</span></span>
+<span id="cb26-32"><a href="#cb26-32" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
+<p>After cleaning and collapsing the population data set, we realized that we would need to remove the diagnosis date column and collapse the morbidity data set prior to joining with the population data set.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>morbidity_collapsed<span class="ot">&lt;-</span>morbidity_all<span class="sc">%&gt;%</span></span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>dt_diagnosis)<span class="sc">%&gt;%</span></span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(county,sex,race_ethnicity,age_cat)<span class="sc">%&gt;%</span></span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">new_infections =</span> <span class="fu">sum</span>(new_infections, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">cumulative_infected =</span> <span class="fu">sum</span>(cumulative_infected, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">new_unrecovered =</span> <span class="fu">sum</span>(new_unrecovered, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">cumulative_unrecovered =</span> <span class="fu">sum</span>(cumulative_unrecovered, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb27-9"><a href="#cb27-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">new_severe =</span> <span class="fu">sum</span>(new_severe, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb27-10"><a href="#cb27-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">cumulative_severe =</span> <span class="fu">sum</span>(cumulative_severe, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb27-11"><a href="#cb27-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">.groups =</span> <span class="st">"drop"</span></span>
+<span id="cb27-12"><a href="#cb27-12" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>We joined the data sets using the full_join() function from dplyr so that all variables would be retained from both data frames. We used the 4 variables shared by both data frames (“county”, “sex”, “race_ethnicity”, and “age_cat”) to ensure the rows are matched correctly for joining.</p>
 <p><strong>Step 2: Select demographic or geographic strata(s) of interest</strong></p>
+<p>Because we selected sex, county, race/ethnicity, and age for the morbidity data set it seems reasonable to select those for the combined population data set.</p>
 <p><strong>Step 3: Create a rate metric and summarize to include only one row per strata of interest</strong></p>
+<p>After preparing the cleaned and collapsed population dataset, we joined it with the summarized morbidity dataset using the four shared strata: county, sex, race/ethnicity, and age category. This join ensured that population counts were aligned with corresponding morbidity totals for each demographic group.</p>
+<p>We then created a new variable, infection_rate_per_100k, to express the number of new infections per 100,000 population. This rate allows comparisons of morbidity across counties, sexes, age groups, and race/ethnicity independent of population size. Each stratum—defined by county, sex, race/ethnicity, and age category—now has a single summarized record that includes both case counts and the calculated infection rate.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Join morbidity and population datasets into a new object</span></span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>ca_id_rate <span class="ot">&lt;-</span> <span class="fu">full_join</span>(</span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>  morbidity_collapsed,</span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>  ca_pop_collapsed,</span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">by =</span> <span class="fu">c</span>(<span class="st">"county"</span>, <span class="st">"sex"</span>, <span class="st">"race_ethnicity"</span>, <span class="st">"age_cat"</span>))</span>
+<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Create infection rate per 100,000 population</span></span>
+<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a>ca_id_rate <span class="ot">&lt;-</span> ca_id_rate <span class="sc">%&gt;%</span></span>
+<span id="cb28-9"><a href="#cb28-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb28-10"><a href="#cb28-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">infection_rate_per_100k =</span> <span class="fu">if_else</span>(</span>
+<span id="cb28-11"><a href="#cb28-11" aria-hidden="true" tabindex="-1"></a>      <span class="sc">!</span><span class="fu">is.na</span>(population) <span class="sc">&amp;</span> population <span class="sc">&gt;</span> <span class="dv">0</span>,</span>
+<span id="cb28-12"><a href="#cb28-12" aria-hidden="true" tabindex="-1"></a>      (new_infections <span class="sc">/</span> population) <span class="sc">*</span> <span class="dv">100000</span>,</span>
+<span id="cb28-13"><a href="#cb28-13" aria-hidden="true" tabindex="-1"></a>      <span class="cn">NA_real_</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><strong>Descriptive Statistics</strong></p>
+<p>To describe the final joined dataset (ca_id_rate), we generated summary statistics for key variables, including new infections, cumulative infections, and infection rate per 100,000 population. These tables provide a snapshot of the overall data and variation by race/ethnicity.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(knitr)</span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. Overall descriptive statistics for numeric variables</span></span>
+<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a>overall_summary <span class="ot">&lt;-</span> ca_id_rate <span class="sc">%&gt;%</span></span>
+<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb29-7"><a href="#cb29-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">n_observations =</span> <span class="fu">n</span>(),</span>
+<span id="cb29-8"><a href="#cb29-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">mean_new_infections =</span> <span class="fu">mean</span>(new_infections, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb29-9"><a href="#cb29-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">median_new_infections =</span> <span class="fu">median</span>(new_infections, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb29-10"><a href="#cb29-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">sd_new_infections =</span> <span class="fu">sd</span>(new_infections, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb29-11"><a href="#cb29-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">mean_infection_rate =</span> <span class="fu">mean</span>(infection_rate_per_100k, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb29-12"><a href="#cb29-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">median_infection_rate =</span> <span class="fu">median</span>(infection_rate_per_100k, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb29-13"><a href="#cb29-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">sd_infection_rate =</span> <span class="fu">sd</span>(infection_rate_per_100k, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb29-14"><a href="#cb29-14" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb29-15"><a href="#cb29-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-16"><a href="#cb29-16" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(overall_summary, <span class="at">caption =</span> <span class="st">"Overall descriptive statistics for numeric variables"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<caption>Overall descriptive statistics for numeric variables</caption>
+<colgroup>
+<col style="width: 11%">
+<col style="width: 14%">
+<col style="width: 16%">
+<col style="width: 13%">
+<col style="width: 14%">
+<col style="width: 16%">
+<col style="width: 13%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: right;">n_observations</th>
+<th style="text-align: right;">mean_new_infections</th>
+<th style="text-align: right;">median_new_infections</th>
+<th style="text-align: right;">sd_new_infections</th>
+<th style="text-align: right;">mean_infection_rate</th>
+<th style="text-align: right;">median_infection_rate</th>
+<th style="text-align: right;">sd_infection_rate</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">3248</td>
+<td style="text-align: right;">1400.734</td>
+<td style="text-align: right;">59</td>
+<td style="text-align: right;">5632.631</td>
+<td style="text-align: right;">12564.15</td>
+<td style="text-align: right;">9245.525</td>
+<td style="text-align: right;">14922.94</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. Total and average infection rate by race/ethnicity</span></span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(scales)  <span class="co"># for comma()</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>
+Attaching package: 'scales'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>The following object is masked from 'package:purrr':
+
+    discard</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>The following object is masked from 'package:readr':
+
+    col_factor</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>race_summary <span class="ot">&lt;-</span> ca_id_rate <span class="sc">%&gt;%</span></span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(race_ethnicity) <span class="sc">%&gt;%</span></span>
+<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">total_new_infections =</span> <span class="fu">sum</span>(new_infections, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">mean_infection_rate =</span> <span class="fu">mean</span>(infection_rate_per_100k, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb34-6"><a href="#cb34-6" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb34-7"><a href="#cb34-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(total_new_infections)) <span class="sc">%&gt;%</span></span>
+<span id="cb34-8"><a href="#cb34-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb34-9"><a href="#cb34-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">total_new_infections =</span> <span class="fu">comma</span>(total_new_infections),</span>
+<span id="cb34-10"><a href="#cb34-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">mean_infection_rate =</span> <span class="fu">comma</span>(<span class="fu">round</span>(mean_infection_rate, <span class="dv">1</span>))</span>
+<span id="cb34-11"><a href="#cb34-11" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb34-12"><a href="#cb34-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-13"><a href="#cb34-13" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(</span>
+<span id="cb34-14"><a href="#cb34-14" aria-hidden="true" tabindex="-1"></a>  race_summary,</span>
+<span id="cb34-15"><a href="#cb34-15" aria-hidden="true" tabindex="-1"></a>  <span class="at">caption =</span> <span class="st">"**Total new infections and mean infection rate per 100K by race/ethnicity**"</span>,</span>
+<span id="cb34-16"><a href="#cb34-16" aria-hidden="true" tabindex="-1"></a>  <span class="at">col.names =</span> <span class="fu">c</span>(<span class="st">"Race/Ethnicity"</span>, <span class="st">"Total New Infections"</span>, <span class="st">"Mean Infection Rate (per 100K)"</span>),</span>
+<span id="cb34-17"><a href="#cb34-17" aria-hidden="true" tabindex="-1"></a>  <span class="at">align =</span> <span class="fu">c</span>(<span class="st">"l"</span>, <span class="st">"r"</span>, <span class="st">"r"</span>)</span>
+<span id="cb34-18"><a href="#cb34-18" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<caption><strong>Total new infections and mean infection rate per 100K by race/ethnicity</strong></caption>
+<colgroup>
+<col style="width: 51%">
+<col style="width: 19%">
+<col style="width: 28%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Race/Ethnicity</th>
+<th style="text-align: right;">Total New Infections</th>
+<th style="text-align: right;">Mean Infection Rate (per 100K)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Hispanic (any race)</td>
+<td style="text-align: right;">1,796,696</td>
+<td style="text-align: right;">11,517</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">White, Non-Hispanic</td>
+<td style="text-align: right;">1,778,774</td>
+<td style="text-align: right;">14,833</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Asian, Non-Hispanic</td>
+<td style="text-align: right;">546,770</td>
+<td style="text-align: right;">11,445</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Black, Non-Hispanic</td>
+<td style="text-align: right;">271,836</td>
+<td style="text-align: right;">13,785</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Multiracial (two or more of above races), Non-Hispanic</td>
+<td style="text-align: right;">116,391</td>
+<td style="text-align: right;">8,552</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">American Indian or Alaska Native, Non-Hispanic</td>
+<td style="text-align: right;">22,195</td>
+<td style="text-align: right;">14,184</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Native Hawaiian or Pacific Islander, Non-Hispanic</td>
+<td style="text-align: right;">16,921</td>
+<td style="text-align: right;">13,716</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p><strong>Data Dictionary</strong></p>
+<p>To document the final cleaned and joined dataset, we created a data dictionary describing the key variables used in our analysis. Each entry includes the variable name, its data type, and a brief description of its meaning or calculation.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tibble)</span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(knitr)</span>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a>data_dictionary <span class="ot">&lt;-</span> <span class="fu">tibble</span>(</span>
+<span id="cb35-5"><a href="#cb35-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">variable_name =</span> <span class="fu">c</span>(</span>
+<span id="cb35-6"><a href="#cb35-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">"county"</span>,</span>
+<span id="cb35-7"><a href="#cb35-7" aria-hidden="true" tabindex="-1"></a>    <span class="st">"sex"</span>,</span>
+<span id="cb35-8"><a href="#cb35-8" aria-hidden="true" tabindex="-1"></a>    <span class="st">"race_ethnicity"</span>,</span>
+<span id="cb35-9"><a href="#cb35-9" aria-hidden="true" tabindex="-1"></a>    <span class="st">"age_cat"</span>,</span>
+<span id="cb35-10"><a href="#cb35-10" aria-hidden="true" tabindex="-1"></a>    <span class="st">"new_infections"</span>,</span>
+<span id="cb35-11"><a href="#cb35-11" aria-hidden="true" tabindex="-1"></a>    <span class="st">"cumulative_infected"</span>,</span>
+<span id="cb35-12"><a href="#cb35-12" aria-hidden="true" tabindex="-1"></a>    <span class="st">"population"</span>,</span>
+<span id="cb35-13"><a href="#cb35-13" aria-hidden="true" tabindex="-1"></a>    <span class="st">"infection_rate_per_100k"</span></span>
+<span id="cb35-14"><a href="#cb35-14" aria-hidden="true" tabindex="-1"></a>  ),</span>
+<span id="cb35-15"><a href="#cb35-15" aria-hidden="true" tabindex="-1"></a>  <span class="at">data_type =</span> <span class="fu">c</span>(</span>
+<span id="cb35-16"><a href="#cb35-16" aria-hidden="true" tabindex="-1"></a>    <span class="st">"character"</span>,</span>
+<span id="cb35-17"><a href="#cb35-17" aria-hidden="true" tabindex="-1"></a>    <span class="st">"character"</span>,</span>
+<span id="cb35-18"><a href="#cb35-18" aria-hidden="true" tabindex="-1"></a>    <span class="st">"character"</span>,</span>
+<span id="cb35-19"><a href="#cb35-19" aria-hidden="true" tabindex="-1"></a>    <span class="st">"character"</span>,</span>
+<span id="cb35-20"><a href="#cb35-20" aria-hidden="true" tabindex="-1"></a>    <span class="st">"numeric"</span>,</span>
+<span id="cb35-21"><a href="#cb35-21" aria-hidden="true" tabindex="-1"></a>    <span class="st">"numeric"</span>,</span>
+<span id="cb35-22"><a href="#cb35-22" aria-hidden="true" tabindex="-1"></a>    <span class="st">"numeric"</span>,</span>
+<span id="cb35-23"><a href="#cb35-23" aria-hidden="true" tabindex="-1"></a>    <span class="st">"numeric"</span></span>
+<span id="cb35-24"><a href="#cb35-24" aria-hidden="true" tabindex="-1"></a>  ),</span>
+<span id="cb35-25"><a href="#cb35-25" aria-hidden="true" tabindex="-1"></a>  <span class="at">description =</span> <span class="fu">c</span>(</span>
+<span id="cb35-26"><a href="#cb35-26" aria-hidden="true" tabindex="-1"></a>    <span class="st">"County in California (includes Los Angeles after harmonization)."</span>,</span>
+<span id="cb35-27"><a href="#cb35-27" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Sex of the population stratum, standardized to title case."</span>,</span>
+<span id="cb35-28"><a href="#cb35-28" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Race/ethnicity category harmonized across datasets."</span>,</span>
+<span id="cb35-29"><a href="#cb35-29" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Age category; population ages 0–4, 5–11, and 12–17 were combined to 0–17."</span>,</span>
+<span id="cb35-30"><a href="#cb35-30" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Number of new infections reported within the time period."</span>,</span>
+<span id="cb35-31"><a href="#cb35-31" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Cumulative number of infections reported to date."</span>,</span>
+<span id="cb35-32"><a href="#cb35-32" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Population count for the matching county/sex/race_ethnicity/age_cat stratum."</span>,</span>
+<span id="cb35-33"><a href="#cb35-33" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Calculated rate of new infections per 100,000 population."</span></span>
+<span id="cb35-34"><a href="#cb35-34" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb35-35"><a href="#cb35-35" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb35-36"><a href="#cb35-36" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-37"><a href="#cb35-37" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(data_dictionary, <span class="at">caption =</span> <span class="st">"Data dictionary for final joined dataset (ca_id_rate)"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<caption>Data dictionary for final joined dataset (ca_id_rate)</caption>
+<colgroup>
+<col style="width: 21%">
+<col style="width: 9%">
+<col style="width: 69%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">variable_name</th>
+<th style="text-align: left;">data_type</th>
+<th style="text-align: left;">description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">county</td>
+<td style="text-align: left;">character</td>
+<td style="text-align: left;">County in California (includes Los Angeles after harmonization).</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">sex</td>
+<td style="text-align: left;">character</td>
+<td style="text-align: left;">Sex of the population stratum, standardized to title case.</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">race_ethnicity</td>
+<td style="text-align: left;">character</td>
+<td style="text-align: left;">Race/ethnicity category harmonized across datasets.</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">age_cat</td>
+<td style="text-align: left;">character</td>
+<td style="text-align: left;">Age category; population ages 0–4, 5–11, and 12–17 were combined to 0–17.</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">new_infections</td>
+<td style="text-align: left;">numeric</td>
+<td style="text-align: left;">Number of new infections reported within the time period.</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">cumulative_infected</td>
+<td style="text-align: left;">numeric</td>
+<td style="text-align: left;">Cumulative number of infections reported to date.</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">population</td>
+<td style="text-align: left;">numeric</td>
+<td style="text-align: left;">Population count for the matching county/sex/race_ethnicity/age_cat stratum.</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">infection_rate_per_100k</td>
+<td style="text-align: left;">numeric</td>
+<td style="text-align: left;">Calculated rate of new infections per 100,000 population.</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 </section>
 
 </main>

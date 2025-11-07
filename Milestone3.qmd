@@ -44,7 +44,7 @@ names(sim_la)
 To prepare the morbidity datasets for analysis, we compared the column names in the California (sim_ca) and Los Angeles (sim_la) files and found several inconsistencies. The same variables were labeled differently across datasets (for example, dt_dx vs. dt_diagnosis, dx_new vs. new_infections). To make them compatible, we created a clear mapping and renamed the LA variables to match the CA format. We also added a county column to the LA data so both files included the same geographic identifier. This standardization step was necessary to allow the two datasets to be combined into one complete morbidity dataset for the state.
 
 | **Original (sim_la)** | **Renamed To (standardized)** | **Purpose / Notes** |
-|---------------------|-----------------------|-----------------------------|
+|---------------------|-----------------------|----------------------------|
 | age_categorydx | dt_diagnosis | Diagnosis date; matches CA dataset |
 | age_category | age_cat | Age group variable |
 | sex | sex | Same name, no change |
@@ -82,7 +82,9 @@ sim_la_clean1 <- sim_la %>%
 
 ```
 
-After aligning the column names, we reviewed the variable values to make sure they were coded consistently across both datasets. Using the project codebook, we recoded the numeric race and ethnicity values in the California dataset into descriptive text labels so they matched the LA County format. We also converted the LA date variable from a SAS-style format (DDMONYYYY) to a standard date format (YYYY-MM-DD).These updates ensured that both datasets use the same categories and formats, which will make it easier to analyze and compare results once they are combined.
+After aligning the column names, we reviewed the variable values to make sure they were coded consistently across both datasets. Using the project codebook, we recoded the numeric race and ethnicity values in the California dataset into descriptive text labels so they matched the LA County format. We also converted the LA date variable from a SAS-style format (DDMONYYYY) to a standard date format (YYYY-MM-DD). These updates ensured that both datasets use the same categories and formats, which will make it easier to analyze and compare results once they are combined.
+
+When comparing the column headers, we found one additional variable in the California dataset (time_int) that was not present in the Los Angeles County file. This column captured time intervals that were not needed for our current analysis, so we removed it to keep the datasets consistent before merging.
 
 ```{r}
 
@@ -101,8 +103,12 @@ sim_ca_clean1 <- sim_ca %>%
       "7" = "Hispanic (any race)",
       "9" = "Unknown"),
     sex = str_to_title(str_trim(sex)),
-    # Remove the word "County" and trim any trailing spaces in county names to align with population data set
+    # Remove the word "County" and trim any trailing spaces in county names 
+    # to align with population data set
     county = str_remove(county, regex("\\s*County$", ignore_case = TRUE)) %>% str_trim())
+
+sim_ca_clean2 <- sim_ca_clean1 %>%
+  select(-time_int)
   
 # Clean and standardize LA Morbidity values
 
@@ -119,29 +125,26 @@ sim_la_clean2 <- sim_la_clean1 %>%
     race_ethnicity = recode(
       race_ethnicity,
       "Hispanic (Any Race)" = "Hispanic (any race)",
-      "American Indian Or Alaska Native, Non-Hispanic" = "American Indian or Alaska            Native, Non-Hispanic", "Native Hawaiian Or Pacific Islander, Non-Hispanic" =           "Native Hawaiian or Pacific Islander, Non-Hispanic", "Multiracial (Two Or More Of        Above Races), Non-Hispanic" = "Multiracial (two or more of above races), Non            -Hispanic"),
+      "American Indian Or Alaska Native, Non-Hispanic" = 
+      "American Indian or Alaska Native, Non-Hispanic", 
+      "Native Hawaiian Or Pacific Islander, Non-Hispanic" = 
+      "Native Hawaiian or Pacific Islander, Non-Hispanic", 
+      "Multiracial (Two Or More Of Above Races), Non-Hispanic" =
+      "Multiracial (two or more of above races), Non-Hispanic"),
     
     # Clean capitalization for sex variable
     sex = str_to_title(sex),
     
-     # Remove the word "County" and trim any trailing spaces in county names to align with population data set
+    # Remove the word "County" and trim any trailing spaces in county names 
+    # to align with population data set
     county = str_remove(county, regex("\\s*County$", ignore_case = TRUE)) %>% str_trim()
   )
-  
-```
 
-When comparing the column headers, we found one additional variable in the California dataset that was not present in the Los Angeles County file. This column captured time intervals that were not needed for our current analysis, so we removed it to keep the datasets consistent before merging. Step 2: Combine morbidity datasets into a single dataset
-
-```{r}
-
-sim_ca_clean2 <- sim_ca_clean1 %>%
-  select(-time_int)
-  
 ```
 
 **Step 2: Combine morbidity datasets into a single dataset**
 
-Now that both morbidity files used the same variable names and value formats, we combined them into one dataset using the bind_rows() function. This step let us put the statewide California records and the Los Angeles County records together in a single file so we can analyze all reported cases at once.
+Now that both morbidity files used the same variable names and value formats, we combined them into one dataset using the bind_rows() function. This step let us put the statewide California records and the Los Angeles County records together in a single file so we can analyze all reported cases at once. The resulting combined dataset, saved as morbidity_all, includes all California and Los Angeles County record and will be used for aggregation and descriptive analyses in the following steps.
 
 ```{r}
 
@@ -154,6 +157,8 @@ morbidity_all <- bind_rows(sim_ca_clean2, sim_la_clean2)
 For the next step, we identified the demographic and geographic strata we want to analyze. The dataset includes several variables that describe population subgroups, such as county, age group, sex, and race/ethnicity. For this analysis, we will focus on differences by sex, county, race/ethnicity, and age, since these are key factors that often influence disease patterns in public health data.
 
 **Step 4: Aggregate the data into a new dataframe to include only one row per strata of interest**
+
+Using the strata we identified in Step 3 (sex, county, race/ethnicity, and age group), we created separate summary tables so that each table contains one row per stratum and the total counts of morbidity measures.
 
 ```{r}
 morbidity_by_sex <- morbidity_all %>%
@@ -273,11 +278,14 @@ morbidity_by_age <- morbidity_all %>%
     )
   )
 morbidity_by_age
+
 ```
 
 ## Population dataset
 
 **Step 1: Recode values to be consistent with morbidity datasets so they can be joined**
+
+We recoded and reformatted variables in the 2023 California population dataset so that county, sex, race/ethnicity, and age category matched the cleaned morbidity dataset. This ensures a successful join on shared keys.
 
 ```{r}
 
@@ -334,16 +342,120 @@ morbidity_collapsed<-morbidity_all%>%
 
 We joined the data sets using the full_join() function from dplyr so that all variables would be retained from both data frames. We used the 4 variables shared by both data frames ("county", "sex", "race_ethnicity", and "age_cat") to ensure the rows are matched correctly for joining.
 
-```{r}
-ca_id <- full_join(
-  morbidity_collapsed,
-  ca_pop_collapsed,
-  by = c("county", "sex", "race_ethnicity", "age_cat")
-)
-```
-
 **Step 2: Select demographic or geographic strata(s) of interest**
 
-Since we selected sex, county, race/ethnicity, and age for the morbidity data set because these are key factors that often influence disease patterns in public health data it seems reasonable to select those for the combined population data set.
+Because we selected sex, county, race/ethnicity, and age for the morbidity data set it seems reasonable to select those for the combined population data set.
 
 **Step 3: Create a rate metric and summarize to include only one row per strata of interest**
+
+After preparing the cleaned and collapsed population dataset, we joined it with the summarized morbidity dataset using the four shared strata: county, sex, race/ethnicity, and age category. This join ensured that population counts were aligned with corresponding morbidity totals for each demographic group.
+
+We then created a new variable, infection_rate_per_100k, to express the number of new infections per 100,000 population. This rate allows comparisons of morbidity across counties, sexes, age groups, and race/ethnicity independent of population size. Each stratum—defined by county, sex, race/ethnicity, and age category—now has a single summarized record that includes both case counts and the calculated infection rate.
+
+```{r}
+
+# Join morbidity and population datasets into a new object
+ca_id_rate <- full_join(
+  morbidity_collapsed,
+  ca_pop_collapsed,
+  by = c("county", "sex", "race_ethnicity", "age_cat"))
+
+# Create infection rate per 100,000 population
+ca_id_rate <- ca_id_rate %>%
+  mutate(
+    infection_rate_per_100k = if_else(
+      !is.na(population) & population > 0,
+      (new_infections / population) * 100000,
+      NA_real_))
+```
+
+**Descriptive Statistics**
+
+To describe the final joined dataset (ca_id_rate), we generated summary statistics for key variables, including new infections, cumulative infections, and infection rate per 100,000 population. These tables provide a snapshot of the overall data and variation by race/ethnicity.
+
+```{r}
+
+library(dplyr)
+library(knitr)
+
+# 1. Overall descriptive statistics for numeric variables
+overall_summary <- ca_id_rate %>%
+  summarise(
+    n_observations = n(),
+    mean_new_infections = mean(new_infections, na.rm = TRUE),
+    median_new_infections = median(new_infections, na.rm = TRUE),
+    sd_new_infections = sd(new_infections, na.rm = TRUE),
+    mean_infection_rate = mean(infection_rate_per_100k, na.rm = TRUE),
+    median_infection_rate = median(infection_rate_per_100k, na.rm = TRUE),
+    sd_infection_rate = sd(infection_rate_per_100k, na.rm = TRUE)
+  )
+
+kable(overall_summary, caption = "Overall descriptive statistics for numeric variables")
+
+# 2. Total and average infection rate by race/ethnicity
+library(scales)  # for comma()
+
+race_summary <- ca_id_rate %>%
+  group_by(race_ethnicity) %>%
+  summarise(
+    total_new_infections = sum(new_infections, na.rm = TRUE),
+    mean_infection_rate = mean(infection_rate_per_100k, na.rm = TRUE)
+  ) %>%
+  arrange(desc(total_new_infections)) %>%
+  mutate(
+    total_new_infections = comma(total_new_infections),
+    mean_infection_rate = comma(round(mean_infection_rate, 1))
+  )
+
+kable(
+  race_summary,
+  caption = "**Total new infections and mean infection rate per 100K by race/ethnicity**",
+  col.names = c("Race/Ethnicity", "Total New Infections", "Mean Infection Rate (per 100K)"),
+  align = c("l", "r", "r")
+)
+
+```
+
+**Data Dictionary**
+
+To document the final cleaned and joined dataset, we created a data dictionary describing the key variables used in our analysis. Each entry includes the variable name, its data type, and a brief description of its meaning or calculation.
+
+```{r}
+library(tibble)
+library(knitr)
+
+data_dictionary <- tibble(
+  variable_name = c(
+    "county",
+    "sex",
+    "race_ethnicity",
+    "age_cat",
+    "new_infections",
+    "cumulative_infected",
+    "population",
+    "infection_rate_per_100k"
+  ),
+  data_type = c(
+    "character",
+    "character",
+    "character",
+    "character",
+    "numeric",
+    "numeric",
+    "numeric",
+    "numeric"
+  ),
+  description = c(
+    "County in California (includes Los Angeles after harmonization).",
+    "Sex of the population stratum, standardized to title case.",
+    "Race/ethnicity category harmonized across datasets.",
+    "Age category; population ages 0–4, 5–11, and 12–17 were combined to 0–17.",
+    "Number of new infections reported within the time period.",
+    "Cumulative number of infections reported to date.",
+    "Population count for the matching county/sex/race_ethnicity/age_cat stratum.",
+    "Calculated rate of new infections per 100,000 population."
+  )
+)
+
+kable(data_dictionary, caption = "Data dictionary for final joined dataset (ca_id_rate)")
+```
