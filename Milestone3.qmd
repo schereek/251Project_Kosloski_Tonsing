@@ -12,9 +12,16 @@ Loading libraries and morbidity data sets from CA and LA County
 ```{r}
 
 # Import libraries
+
 library(readr)
 library(dplyr)
 library(janitor)
+library(scales)
+library(tidyverse)
+library(knitr)
+library(kableExtra)
+library(tibble)
+
 
 # Import and clean column names (this was cut and pasted from Milestone2 qmd)
 
@@ -26,9 +33,6 @@ ca_pop <- read_csv("data/ca_pop_2023.csv", show_col_types = FALSE) |> clean_name
 ```
 
 ```{r}
-
-library(tidyverse)
-library(janitor)
 
 sim_ca <- sim_ca %>% clean_names()
 sim_la <- sim_la %>% clean_names()
@@ -43,20 +47,61 @@ names(sim_la)
 
 To prepare the morbidity datasets for analysis, we compared the column names in the California (sim_ca) and Los Angeles (sim_la) files and found several inconsistencies. The same variables were labeled differently across datasets (for example, dt_dx vs. dt_diagnosis, dx_new vs. new_infections). To make them compatible, we created a clear mapping and renamed the LA variables to match the CA format. We also added a county column to the LA data so both files included the same geographic identifier. This standardization step was necessary to allow the two datasets to be combined into one complete morbidity dataset for the state.
 
-| **Original (sim_la)** | **Renamed To (standardized)** | **Purpose / Notes** |
-|------------------------|------------------------|------------------------|
-| age_categorydx | dt_diagnosis | Diagnosis date; matches CA dataset |
-| age_category | age_cat | Age group variable |
-| sex | sex | Same name, no change |
-| race_eth | race_ethnicity | Aligns with CA naming convention |
-| dt_report | *(not used)* | LA-specific; excluded to align with CA |
-| dx_new | new_infections | Number of newly diagnosed infections |
-| infected_cumulative | cumulative_infected | Total infections to date |
-| unrecovered_new | new_unrecovered | Newly unrecovered cases |
-| unrecovered_cumulative | cumulative`_`unrecovered | Total unrecovered cases |
-| severe_new | new\_ severe | Newly severe cases |
-| severe_cumulative | cumulative_severe | Total severe cases |
-| *(new variable)* | county = "Los Angeles" | Added to identify LA County source |
+```{r}
+
+recodes <- tibble(
+  original_sim_la = c(
+    "age_categorydx",
+    "age_category",
+    "sex",
+    "race_eth",
+    "dt_report",
+    "dx_new",
+    "infected_cumulative",
+    "unrecovered_new",
+    "unrecovered_cumulative",
+    "severe_new",
+    "severe_cumulative",
+    "(new variable)"
+  ),
+  renamed_to = c(
+    "dt_diagnosis",
+    "age_cat",
+    "sex",
+    "race_ethnicity",
+    "(not used)",
+    "new_infections",
+    "cumulative_infected",
+    "new_unrecovered",
+    "cumulative_unrecovered",
+    "new_severe",
+    "cumulative_severe",
+    "county = 'Los Angeles'"
+  ),
+  purpose_notes = c(
+    "Diagnosis date; matches CA dataset",
+    "Age group variable",
+    "Same name, no change",
+    "Aligns with CA naming convention",
+    "Excluded; LA-specific column",
+    "Number of new infections",
+    "Total infections to date",
+    "Newly unrecovered cases",
+    "Total unrecovered cases",
+    "Newly severe cases",
+    "Total severe cases",
+    "Added to identify LA County source"
+  )
+)
+
+kable(
+  recodes,
+  caption = "<b style='font-size:16px; color:black;'>Variable harmonization: Los Angeles (sim_la) → standardized dataset</b>",
+  col.names = c("Original (sim_la)", "Renamed to (standardized)", "Purpose / notes"),
+  format = "html"
+) %>%
+  kable_styling(full_width = FALSE, position = "left")
+```
 
 ```{r}
 
@@ -161,6 +206,7 @@ For the next step, we identified the demographic and geographic strata we want t
 Using the strata we identified in Step 3 (sex, county, race/ethnicity, and age group), we created separate summary tables so that each table contains one row per stratum and the total counts of morbidity measures.
 
 ```{r}
+
 morbidity_by_sex <- morbidity_all %>%
   select(-county, 
          -age_cat, 
@@ -187,7 +233,24 @@ morbidity_by_sex <- morbidity_all %>%
       cum_unrecovered_tot = sum(cum_unrecovered_tot, na.rm = TRUE)
     )
   )
-morbidity_by_sex
+morbidity_by_sex %>%
+  mutate(across(where(is.numeric), ~ comma(., accuracy = 1))) %>%
+  kable(
+    caption = "<b style='font-size:16px; color:black;'>Total and cumulative infections by sex</b>",
+    col.names = c(
+      "Sex",
+      "New<br>Infections<br>(Total)",
+      "Cumulative<br>Infected<br>(Total)",
+      "New<br>Severe<br>(Total)",
+      "Cumulative<br>Severe<br>(Total)",
+      "New<br>Unrecovered<br>(Total)",
+      "Cumulative<br>Unrecovered<br>(Total)"
+    ),
+    align = c("l", "r", "r", "r", "r", "r", "r"),
+    escape = FALSE,
+    format = "html"
+  ) %>%
+  kable_styling(position = "left", full_width = FALSE)
 ```
 
 ```{r}
@@ -217,7 +280,23 @@ morbidity_by_county <- morbidity_all %>%
       cum_unrecovered_tot = sum(cum_unrecovered_tot, na.rm = TRUE)
     )
   )
-head(morbidity_by_county)
+head(morbidity_by_county) %>%
+  mutate(across(where(is.numeric), ~ comma(., accuracy = 1))) %>%
+  kable(
+    caption = "<b style='font-size:16px; color:black;'>Total and cumulative infections by county (top 6)</b>",
+    col.names = c(
+      "County",
+      "New Infections (Total)",
+      "Cumulative Infected (Total)",
+      "New Severe (Total)",
+      "Cumulative Severe (Total)",
+      "New Unrecovered (Total)",
+      "Cumulative Unrecovered (Total)"
+    ),
+    align = c("l", "r", "r", "r", "r", "r", "r"),
+    format = "html"
+  ) %>%
+  kable_styling(position = "left")
 ```
 
 ```{r}
@@ -251,6 +330,7 @@ head(morbidity_by_race_ethnicity)
 ```
 
 ```{r}
+
 morbidity_by_age <- morbidity_all %>%
   select(-county, 
          -sex, 
@@ -277,7 +357,26 @@ morbidity_by_age <- morbidity_all %>%
       cum_unrecovered_tot = sum(cum_unrecovered_tot, na.rm = TRUE)
     )
   )
-morbidity_by_age
+
+morbidity_by_age %>%
+  # Add commas to numeric columns
+  mutate(across(where(is.numeric), ~ comma(., accuracy = 1))) %>%
+  kable(
+    caption = "<b style='font-size:16px; color:black;'>Total and cumulative infections by age category</b>",
+    col.names = c(
+      "Age<br>category",
+      "New<br>infections<br>(total)",
+      "Cumulative<br>infected<br>(total)",
+      "New<br>severe<br>(total)",
+      "Cumulative<br>severe<br>(total)",
+      "New<br>unrecovered<br>(total)",
+      "Cumulative<br>unrecovered<br>(total)"
+    ),
+    align = c("l", "r", "r", "r", "r", "r", "r"),
+    escape = FALSE,  # allows HTML <br> for line breaks
+    format = "html"
+  ) %>%
+  kable_styling(position = "left", full_width = FALSE)
 
 ```
 
@@ -375,127 +474,144 @@ To describe the final joined dataset (ca_id_rate), we generated summary statisti
 
 ```{r}
 
-library(dplyr)
-library(knitr)
-library(kableExtra)
-
-# 1. Overall descriptive statistics for numeric variables
 overall_summary <- ca_id_rate %>%
   summarise(
-    n_observations = sum(new_infections),
+    n_observations      = sum(new_infections),
     mean_new_infections = mean(new_infections, na.rm = TRUE),
     median_new_infections = median(new_infections, na.rm = TRUE),
-    sd_new_infections = sd(new_infections, na.rm = TRUE),
-    mean_infection_rate = mean(infection_rate_per_100k, na.rm = TRUE),
+    sd_new_infections   = sd(new_infections, na.rm = TRUE),
+    mean_infection_rate   = mean(infection_rate_per_100k, na.rm = TRUE),
     median_infection_rate = median(infection_rate_per_100k, na.rm = TRUE),
-    sd_infection_rate = sd(infection_rate_per_100k, na.rm = TRUE)
+    sd_infection_rate     = sd(infection_rate_per_100k, na.rm = TRUE)
   )
 
-kable(
-  overall_summary,
-  caption = "Overall descriptive statistics for numeric variables",
-  col.names = c("observations",
-                "mean", 
-                "median", 
-                "standard deviation", 
-                "mean", 
-                "median", 
-                "standard deviation"),
-  format = "html"
-) %>%
-  kable_styling(position = "left")%>%
-  add_header_above(c("New infections" = 4, 
-                     "Infection rate" = 3))
+overall_summary %>%
+  mutate(across(where(is.numeric), ~ comma(., accuracy = 1))) %>%
+  kable(
+    caption = "<b style='font-size:16px; color:black;'>Overall descriptive statistics for numeric variables</b>",
+    col.names = c(
+      "observations",
+      "mean", "median", "standard deviation",   # new infections
+      "mean", "median", "standard deviation"    # infection rate
+    ),
+    format = "html",
+    escape = FALSE
+  ) %>%
+  kable_styling(position = "left") %>%
+  add_header_above(c("New infections" = 4, "Infection rate" = 3))
 
 ```
 
 ```{r}
-# 2. Total and average infection rate by race/ethnicity
-library(scales)  # for comma()
 race_summary <- ca_id_rate %>%
   group_by(race_ethnicity) %>%
   summarise(
     total_new_infections = sum(new_infections, na.rm = TRUE),
-    mean_infection_rate = mean(infection_rate_per_100k, na.rm = TRUE)
+    mean_infection_rate  = mean(infection_rate_per_100k, na.rm = TRUE)
   ) %>%
   arrange(desc(total_new_infections)) %>%
   mutate(
     total_new_infections = comma(total_new_infections),
-    mean_infection_rate = comma(round(mean_infection_rate, 1))
+    mean_infection_rate  = comma(round(mean_infection_rate, 1))
   )
 
 kable(
   race_summary,
-  caption = "**Total new infections and mean infection rate per 100K by race/ethnicity**",
-  col.names = c("Race/Ethnicity", "Total New Infections", "Mean Infection Rate (per 100K)"),
-  align = c("l", "r", "r")
-)
+  caption = "<b style='font-size:16px; color:black;'>Total new infections and mean infection rate per 100K by race/ethnicity</b>",
+  col.names = c(
+    "Race/<br>Ethnicity",
+    "Total<br>New Infections",
+    "Mean Infection Rate<br>(per 100K)"
+  ),
+  align = c("l", "r", "r"),
+  escape = FALSE,
+  format = "html"
+) %>%
+  kable_styling(position = "left", full_width = FALSE)
 ```
 
 ```{r}
-# 3. Total and average infection rate by age category
 age_summary <- ca_id_rate %>%
   group_by(age_cat) %>%
   summarise(
     total_new_infections = sum(new_infections, na.rm = TRUE),
-    mean_infection_rate = mean(infection_rate_per_100k, na.rm = TRUE)
+    mean_infection_rate  = mean(infection_rate_per_100k, na.rm = TRUE)
   ) %>%
   mutate(
     total_new_infections = comma(total_new_infections),
-    mean_infection_rate = comma(round(mean_infection_rate, 1))
+    mean_infection_rate  = comma(round(mean_infection_rate, 1))
   )
 
 kable(
   age_summary,
-  caption = "**Total new infections and mean infection rate per 100K by age category**",
-  col.names = c("age category", "Total New Infections", "Mean Infection Rate (per 100K)"),
-  align = c("l", "r", "r")
-)
+  caption = "<b style='font-size:16px; color:black;'>Total new infections and mean infection rate per 100K by age category</b>",
+  col.names = c(
+    "Age<br>category",
+    "Total<br>New Infections",
+    "Mean Infection Rate<br>(per 100K)"
+  ),
+  align = c("l", "r", "r"),
+  escape = FALSE, 
+  format = "html"
+) %>%
+  kable_styling(position = "left")
 
 ```
 
 ```{r}
-# 4. Total and average infection rate by county
 county_summary <- ca_id_rate %>%
   group_by(county) %>%
   summarise(
     total_new_infections = sum(new_infections, na.rm = TRUE),
-    mean_infection_rate = mean(infection_rate_per_100k, na.rm = TRUE)
+    mean_infection_rate  = mean(infection_rate_per_100k, na.rm = TRUE)
   ) %>%
   arrange(desc(mean_infection_rate)) %>%
   mutate(
     total_new_infections = comma(total_new_infections),
-    mean_infection_rate = comma(round(mean_infection_rate, 1))
+    mean_infection_rate  = comma(round(mean_infection_rate, 1))
   )
 
 kable(
   county_summary,
-  caption = "**Total new infections and mean infection rate per 100K by county**",
-  col.names = c("County", "Total New Infections", "Mean Infection Rate (per 100K)"),
-  align = c("l", "r", "r")
-)
+  caption = "<b style='font-size:16px; color:black;'>Total new infections and mean infection rate per 100K by county</b>",
+  col.names = c(
+    "County",
+    "Total<br>New Infections",
+    "Mean Infection Rate<br>(per 100K)"
+  ),
+  align = c("l", "r", "r"),
+  escape = FALSE,  # allows <br> for line breaks
+  format = "html"
+) %>%
+  kable_styling(position = "left")
 ```
 
 ```{r}
-# 5. Total and average infection rate by sex
 sex_summary <- ca_id_rate %>%
   group_by(sex) %>%
   summarise(
     total_new_infections = sum(new_infections, na.rm = TRUE),
-    mean_infection_rate = mean(infection_rate_per_100k, na.rm = TRUE)
+    mean_infection_rate  = mean(infection_rate_per_100k, na.rm = TRUE)
   ) %>%
   arrange(desc(total_new_infections)) %>%
   mutate(
     total_new_infections = comma(total_new_infections),
-    mean_infection_rate = comma(round(mean_infection_rate, 1))
+    mean_infection_rate  = comma(round(mean_infection_rate, 1))
   )
 
 kable(
   sex_summary,
-  caption = "**Total new infections and mean infection rate per 100K by sex**",
-  col.names = c("sex", "Total New Infections", "Mean Infection Rate (per 100K)"),
-  align = c("l", "r", "r")
-)
+  caption = "<b style='font-size:16px; color:black;'>Total new infections and mean infection rate per 100K by sex</b>",
+  col.names = c(
+    "Sex",
+    "Total<br>New Infections",
+    "Mean Infection Rate<br>(per 100K)"
+  ),
+  align = c("l", "r", "r"),
+  escape = FALSE,   # allows HTML formatting in headers
+  format = "html"
+) %>%
+  kable_styling(position = "left")
 ```
 
 **Data Dictionary**
@@ -503,8 +619,6 @@ kable(
 To document the final cleaned and joined dataset, we created a data dictionary describing the key variables used in our analysis. Each entry includes the variable name, its data type, and a brief description of its meaning or calculation.
 
 ```{r}
-library(tibble)
-library(knitr)
 
 data_dictionary <- tibble(
   variable_name = c(
@@ -539,5 +653,13 @@ data_dictionary <- tibble(
   )
 )
 
-kable(data_dictionary, caption = "Data dictionary for final joined dataset (ca_id_rate)")
+data_dictionary %>%
+  kable(
+    caption = "<b style='font-size:16px; color:black;'>Data dictionary for final joined dataset (ca_id_rate)</b>",
+    col.names = c("Variable name", "Data type", "Description"),
+    format = "html",
+    escape = FALSE,
+    align = c("l", "l", "l")
+  ) %>%
+  kable_styling(position = "left", full_width = FALSE)
 ```
