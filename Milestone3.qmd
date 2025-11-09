@@ -44,7 +44,7 @@ names(sim_la)
 To prepare the morbidity datasets for analysis, we compared the column names in the California (sim_ca) and Los Angeles (sim_la) files and found several inconsistencies. The same variables were labeled differently across datasets (for example, dt_dx vs. dt_diagnosis, dx_new vs. new_infections). To make them compatible, we created a clear mapping and renamed the LA variables to match the CA format. We also added a county column to the LA data so both files included the same geographic identifier. This standardization step was necessary to allow the two datasets to be combined into one complete morbidity dataset for the state.
 
 | **Original (sim_la)** | **Renamed To (standardized)** | **Purpose / Notes** |
-|---------------------|-----------------------|----------------------------|
+|------------------------|------------------------|------------------------|
 | age_categorydx | dt_diagnosis | Diagnosis date; matches CA dataset |
 | age_category | age_cat | Age group variable |
 | sex | sex | Same name, no change |
@@ -348,9 +348,9 @@ Because we selected sex, county, race/ethnicity, and age for the morbidity data 
 
 **Step 3: Create a rate metric and summarize to include only one row per strata of interest**
 
-After preparing the cleaned and collapsed population dataset, we joined it with the summarized morbidity dataset using the four shared strata: county, sex, race/ethnicity, and age category. This join ensured that population counts were aligned with corresponding morbidity totals for each demographic group.
+After preparing the cleaned and collapsed population dataset, we joined it with the summarized morbidity dataset using the four shared variables: county, sex, race/ethnicity, and age category. This join ensured that population counts were aligned with corresponding morbidity totals for each demographic group.
 
-We then created a new variable, infection_rate_per_100k, to express the number of new infections per 100,000 population. This rate allows comparisons of morbidity across counties, sexes, age groups, and race/ethnicity independent of population size. Each stratum—defined by county, sex, race/ethnicity, and age category—now has a single summarized record that includes both case counts and the calculated infection rate.
+We then created a new variable, infection_rate_per_100k, to express the number of new infections per 100,000 population. This rate allows comparisons of morbidity across counties, sexes, age groups, and race/ethnicity independent of population size. Each stratum within the variables of county, sex, race/ethnicity, and age category—now has a single summarized record that includes both case counts and the calculated infection rate.
 
 ```{r}
 
@@ -371,17 +371,18 @@ ca_id_rate <- ca_id_rate %>%
 
 **Descriptive Statistics**
 
-To describe the final joined dataset (ca_id_rate), we generated summary statistics for key variables, including new infections, cumulative infections, and infection rate per 100,000 population. These tables provide a snapshot of the overall data and variation by race/ethnicity.
+To describe the final joined dataset (ca_id_rate), we generated summary statistics for key variables, including new infections, cumulative infections, and infection rate per 100,000 population. These tables provide a snapshot of the overall data and variations by race/ethnicity, sex, county, and age category.
 
 ```{r}
 
 library(dplyr)
 library(knitr)
+library(kableExtra)
 
 # 1. Overall descriptive statistics for numeric variables
 overall_summary <- ca_id_rate %>%
   summarise(
-    n_observations = n(),
+    n_observations = sum(new_infections),
     mean_new_infections = mean(new_infections, na.rm = TRUE),
     median_new_infections = median(new_infections, na.rm = TRUE),
     sd_new_infections = sd(new_infections, na.rm = TRUE),
@@ -390,11 +391,27 @@ overall_summary <- ca_id_rate %>%
     sd_infection_rate = sd(infection_rate_per_100k, na.rm = TRUE)
   )
 
-kable(overall_summary, caption = "Overall descriptive statistics for numeric variables")
+kable(
+  overall_summary,
+  caption = "Overall descriptive statistics for numeric variables",
+  col.names = c("observations",
+                "mean", 
+                "median", 
+                "standard deviation", 
+                "mean", 
+                "median", 
+                "standard deviation"),
+  format = "html"
+) %>%
+  kable_styling(position = "left")%>%
+  add_header_above(c("New infections" = 4, 
+                     "Infection rate" = 3))
 
+```
+
+```{r}
 # 2. Total and average infection rate by race/ethnicity
 library(scales)  # for comma()
-
 race_summary <- ca_id_rate %>%
   group_by(race_ethnicity) %>%
   summarise(
@@ -413,7 +430,72 @@ kable(
   col.names = c("Race/Ethnicity", "Total New Infections", "Mean Infection Rate (per 100K)"),
   align = c("l", "r", "r")
 )
+```
 
+```{r}
+# 3. Total and average infection rate by age category
+age_summary <- ca_id_rate %>%
+  group_by(age_cat) %>%
+  summarise(
+    total_new_infections = sum(new_infections, na.rm = TRUE),
+    mean_infection_rate = mean(infection_rate_per_100k, na.rm = TRUE)
+  ) %>%
+  mutate(
+    total_new_infections = comma(total_new_infections),
+    mean_infection_rate = comma(round(mean_infection_rate, 1))
+  )
+
+kable(
+  age_summary,
+  caption = "**Total new infections and mean infection rate per 100K by age category**",
+  col.names = c("age category", "Total New Infections", "Mean Infection Rate (per 100K)"),
+  align = c("l", "r", "r")
+)
+
+```
+
+```{r}
+# 4. Total and average infection rate by county
+county_summary <- ca_id_rate %>%
+  group_by(county) %>%
+  summarise(
+    total_new_infections = sum(new_infections, na.rm = TRUE),
+    mean_infection_rate = mean(infection_rate_per_100k, na.rm = TRUE)
+  ) %>%
+  arrange(desc(mean_infection_rate)) %>%
+  mutate(
+    total_new_infections = comma(total_new_infections),
+    mean_infection_rate = comma(round(mean_infection_rate, 1))
+  )
+
+kable(
+  county_summary,
+  caption = "**Total new infections and mean infection rate per 100K by county**",
+  col.names = c("County", "Total New Infections", "Mean Infection Rate (per 100K)"),
+  align = c("l", "r", "r")
+)
+```
+
+```{r}
+# 5. Total and average infection rate by sex
+sex_summary <- ca_id_rate %>%
+  group_by(sex) %>%
+  summarise(
+    total_new_infections = sum(new_infections, na.rm = TRUE),
+    mean_infection_rate = mean(infection_rate_per_100k, na.rm = TRUE)
+  ) %>%
+  arrange(desc(total_new_infections)) %>%
+  mutate(
+    total_new_infections = comma(total_new_infections),
+    mean_infection_rate = comma(round(mean_infection_rate, 1))
+  )
+
+kable(
+  sex_summary,
+  caption = "**Total new infections and mean infection rate per 100K by sex**",
+  col.names = c("sex", "Total New Infections", "Mean Infection Rate (per 100K)"),
+  align = c("l", "r", "r")
+)
 ```
 
 **Data Dictionary**
