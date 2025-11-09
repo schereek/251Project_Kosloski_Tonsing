@@ -326,7 +326,24 @@ morbidity_by_race_ethnicity <- morbidity_all %>%
       cum_unrecovered_tot = sum(cum_unrecovered_tot, na.rm = TRUE)
     )
   )
-head(morbidity_by_race_ethnicity)
+morbidity_by_race_ethnicity %>%
+  mutate(across(where(is.numeric), ~ comma(., accuracy = 1))) %>%
+  kable(
+    caption = "<b style='font-size:16px; color:black;'>Total and cumulative infections by race/ethnicity</b>",
+    col.names = c(
+      "Sex",
+      "New<br>Infections<br>(Total)",
+      "Cumulative<br>Infected<br>(Total)",
+      "New<br>Severe<br>(Total)",
+      "Cumulative<br>Severe<br>(Total)",
+      "New<br>Unrecovered<br>(Total)",
+      "Cumulative<br>Unrecovered<br>(Total)"
+    ),
+    align = c("l", "r", "r", "r", "r", "r", "r"),
+    escape = FALSE,
+    format = "html"
+  ) %>%
+  kable_styling(position = "left", full_width = FALSE)
 ```
 
 ```{r}
