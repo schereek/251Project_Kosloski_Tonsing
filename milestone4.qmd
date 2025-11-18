@@ -4,7 +4,7 @@ format: html
 editor: visual
 ---
 
-## Cleaning and Joining data sets 
+## Cleaning and Joining data sets
 
 -   Join all datasets together
 
@@ -27,6 +27,7 @@ library(tidyverse)
 library(knitr)
 library(kableExtra)
 library(tibble)
+library(forcats)
 
 
 # Import and clean column names (this was cut and pasted from Milestone2 qmd)
@@ -170,7 +171,70 @@ ca_id_rate <- full_join(
 
 ```{r}
 
+ca_id_rate %>%
+  group_by(race_ethnicity, sex) %>%
+  summarise(rate = (sum(new_infections) / sum(population)) * 100000) %>%
+  ggplot(aes(
+    x = fct_reorder(race_ethnicity, rate, .fun = max, .desc = FALSE),  # highest at top
+    y = rate,
+    fill = sex
+  )) +
+  geom_col(position = "dodge") +
+  coord_flip() +
+  labs(
+    title = "Novel Respiratory Disease in California: New Infection Rate per 100,000\nby Race/Ethnicity and Sex",
+    x = "Race/Ethnicity",
+    y = "Rate per 100,000",
+    fill = "Sex",
+    caption = "Source: SIM CA and LA Morbidity Files + CA DOF Population Estimates"
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title.position = "plot",
+    plot.title = element_text(hjust = 0.5)
+  )
 
+
+```
+
+Interpretation: Infection rates for the novel respiratory disease in California show clear racial and ethnic disparities. American Indian or Alaska Native and White, Non-Hispanic populations experience the highest infection rates, followed by Black, Non-Hispanic and Hispanic populations. Native Hawaiian or Pacific Islander, Asian, and Multiracial populations have noticeably lower rates. Differences between males and females within each racial/ethnic group are present but relatively small compared with the larger disparities across groups.
+
+```{r}
+
+table_data <- ca_id_rate %>%
+  group_by(race_ethnicity, sex) %>%
+  summarise(rate = (sum(new_infections) / sum(population)) * 100000,
+            .groups = "drop") %>%
+  tidyr::pivot_wider(names_from = sex, values_from = rate) %>%
+  mutate(
+    Overall = (Female + Male) / 2,
+    race_ethnicity = fct_reorder(race_ethnicity, Overall, .desc = TRUE)) %>%
+  arrange(race_ethnicity) %>%
+  mutate(
+    Female = comma(round(Female, 1)),
+    Male = comma(round(Male, 1)),
+    Overall = comma(round(Overall, 1)))
+
+caption_html <- "<span style='color:black; font-weight:bold; font-size:20px;'>
+Novel Respiratory Disease in California: New Infection Rate per 100,000\nby Race/Ethnicity and Sex
+</span>"
+
+table_data %>%
+  kable(
+    caption = caption_html,
+    col.names = c("Race/Ethnicity", "Female", "Male", "Overall"),
+    align = c("l", "r", "r", "r"),
+    escape = FALSE,       # <-- allows HTML in caption
+    format = "html") %>%
+  kable_styling(
+    bootstrap_options = c("striped", "hover", "condensed"),
+    full_width = FALSE,
+    position = "center",
+    font_size = 14) %>%
+  column_spec(1, bold = TRUE) %>%
+  row_spec(0, bold = TRUE, font_size = 16) %>%
+  add_header_above(c(" " = 1, "Infection Rate per 100,000" = 3),
+                   bold = TRUE, font_size = 16)
 
 ```
 
