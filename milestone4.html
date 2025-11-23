@@ -108,41 +108,19 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li><p>Utilize <code style="font-family: Monaco, Menlo, Consolas, &quot;Courier New&quot;, monospace; font-size: 0.75rem; border-radius: 6px; background-color: rgb(242, 244, 244); border: 1px solid rgb(232, 234, 236); padding: 0.125rem 0.25rem; color: rgb(199, 31, 35); text-size-adjust: auto;">warning=FALSE</code> and <code style="font-family: Monaco, Menlo, Consolas, &quot;Courier New&quot;, monospace; font-size: 0.75rem; border-radius: 6px; background-color: rgb(242, 244, 244); border: 1px solid rgb(232, 234, 236); padding: 0.125rem 0.25rem; color: rgb(199, 31, 35); text-size-adjust: auto;">message=FALSE</code> to suppress any warnings/messages that may be displaying from any chunks</p></li>
 </ul>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>ca_id_rate <span class="sc">%&gt;%</span></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(race_ethnicity, sex) <span class="sc">%&gt;%</span></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">rate =</span> (<span class="fu">sum</span>(new_infections) <span class="sc">/</span> <span class="fu">sum</span>(population)) <span class="sc">*</span> <span class="dv">100000</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="fu">fct_reorder</span>(race_ethnicity, rate, <span class="at">.fun =</span> max, <span class="at">.desc =</span> <span class="cn">FALSE</span>),  <span class="co"># highest at top</span></span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> rate,</span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">fill =</span> sex</span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>  )) <span class="sc">+</span></span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="at">position =</span> <span class="st">"dodge"</span>) <span class="sc">+</span></span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>() <span class="sc">+</span></span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Novel Respiratory Disease in California: New Infection Rate per 100,000</span><span class="sc">\n</span><span class="st">by Race/Ethnicity and Sex"</span>,</span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Race/Ethnicity"</span>,</span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Rate per 100,000"</span>,</span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">fill =</span> <span class="st">"Sex"</span>,</span>
-<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">caption =</span> <span class="st">"Source: SIM CA and LA Morbidity Files + CA DOF Population Estimates"</span></span>
-<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
-<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
-<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
-<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.title.position =</span> <span class="st">"plot"</span>,</span>
-<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">hjust =</span> <span class="fl">0.5</span>)</span>
-<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stderr">
-<pre><code>`summarise()` has grouped output by 'race_ethnicity'. You can override using
-the `.groups` argument.</code></pre>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># joining morbidity data sets (copied from milestone 3)</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>morbidity_all <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(sim_ca_clean2, sim_la_clean2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="milestone4_files/figure-html/unnamed-chunk-1-1.png" class="img-fluid figure-img" width="672"></p>
-</figure>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Join morbidity and population datasets into a new object</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>ca_id_rate <span class="ot">&lt;-</span> <span class="fu">full_join</span>(</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  morbidity_collapsed,</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  ca_pop_collapsed,</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">by =</span> <span class="fu">c</span>(<span class="st">"county"</span>, <span class="st">"sex"</span>, <span class="st">"race_ethnicity"</span>, <span class="st">"age_cat"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-</div>
-</div>
-<p>Interpretation: Infection rates for the novel respiratory disease in California show clear racial and ethnic disparities. American Indian or Alaska Native and White, Non-Hispanic populations experience the highest infection rates, followed by Black, Non-Hispanic and Hispanic populations. Native Hawaiian or Pacific Islander, Asian, and Multiracial populations have noticeably lower rates. Differences between males and females within each racial/ethnic group are present but relatively small compared with the larger disparities across groups.</p>
+</section>
+<section id="visualizations-at-least-one-per-group-member" class="level2">
+<h2 class="anchored" data-anchor-id="visualizations-at-least-one-per-group-member">Visualizations (at least one per group member)</h2>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>table_data <span class="ot">&lt;-</span> ca_id_rate <span class="sc">%&gt;%</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(race_ethnicity, sex) <span class="sc">%&gt;%</span></span>
@@ -204,45 +182,45 @@ Infection Rate per 100,000
 <tbody>
 <tr class="odd">
 <td style="text-align: left; font-weight: bold;">American Indian or Alaska Native, Non-Hispanic</td>
-<td style="text-align: right;">14,183</td>
-<td style="text-align: right;">13,791.4</td>
-<td style="text-align: right;">13,987</td>
+<td style="text-align: right;">14,183.20</td>
+<td style="text-align: right;">13,791.40</td>
+<td style="text-align: right;">13,987.30</td>
 </tr>
 <tr class="even">
 <td style="text-align: left; font-weight: bold;">White, Non-Hispanic</td>
-<td style="text-align: right;">12,954</td>
-<td style="text-align: right;">12,734.8</td>
-<td style="text-align: right;">12,844</td>
+<td style="text-align: right;">12,953.90</td>
+<td style="text-align: right;">12,734.80</td>
+<td style="text-align: right;">12,844.30</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left; font-weight: bold;">Black, Non-Hispanic</td>
-<td style="text-align: right;">12,100</td>
-<td style="text-align: right;">12,491.3</td>
-<td style="text-align: right;">12,296</td>
+<td style="text-align: right;">12,099.90</td>
+<td style="text-align: right;">12,491.30</td>
+<td style="text-align: right;">12,295.60</td>
 </tr>
 <tr class="even">
 <td style="text-align: left; font-weight: bold;">Hispanic (any race)</td>
-<td style="text-align: right;">11,763</td>
-<td style="text-align: right;">12,482.6</td>
-<td style="text-align: right;">12,123</td>
+<td style="text-align: right;">11,763.20</td>
+<td style="text-align: right;">12,482.60</td>
+<td style="text-align: right;">12,122.90</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left; font-weight: bold;">Native Hawaiian or Pacific Islander, Non-Hispanic</td>
-<td style="text-align: right;">10,948</td>
-<td style="text-align: right;">11,066.5</td>
-<td style="text-align: right;">11,008</td>
+<td style="text-align: right;">10,948.50</td>
+<td style="text-align: right;">11,066.50</td>
+<td style="text-align: right;">11,007.50</td>
 </tr>
 <tr class="even">
 <td style="text-align: left; font-weight: bold;">Asian, Non-Hispanic</td>
-<td style="text-align: right;">8,714</td>
-<td style="text-align: right;">8,653.8</td>
-<td style="text-align: right;">8,684</td>
+<td style="text-align: right;">8,713.60</td>
+<td style="text-align: right;">8,653.80</td>
+<td style="text-align: right;">8,683.70</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left; font-weight: bold;">Multiracial (two or more of above races), Non-Hispanic</td>
-<td style="text-align: right;">7,211</td>
-<td style="text-align: right;">7,234.3</td>
-<td style="text-align: right;">7,223</td>
+<td style="text-align: right;">7,211.10</td>
+<td style="text-align: right;">7,234.30</td>
+<td style="text-align: right;">7,222.70</td>
 </tr>
 </tbody>
 </table>
@@ -250,9 +228,122 @@ Infection Rate per 100,000
 
 </div>
 </div>
-</section>
-<section id="visualizations-at-least-one-per-group-member" class="level2">
-<h2 class="anchored" data-anchor-id="visualizations-at-least-one-per-group-member">Visualizations (at least one per group member)</h2>
+<p>Interpretation: Infection rates for the novel respiratory disease in California show clear racial and ethnic disparities. American Indian or Alaska Native and White, Non-Hispanic populations experience the highest infection rates, followed by Black, Non-Hispanic and Hispanic populations. Native Hawaiian or Pacific Islander, Asian, and Multiracial populations have noticeably lower rates. Differences between males and females within each racial/ethnic group are present but relatively small compared with the larger disparities across groups.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>ca_id_rate <span class="sc">%&gt;%</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(race_ethnicity, sex) <span class="sc">%&gt;%</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">rate =</span> (<span class="fu">sum</span>(new_infections) <span class="sc">/</span> <span class="fu">sum</span>(population)) <span class="sc">*</span> <span class="dv">100000</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="fu">fct_reorder</span>(race_ethnicity, rate, <span class="at">.fun =</span> max, <span class="at">.desc =</span> <span class="cn">FALSE</span>),  <span class="co"># highest at top</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> rate,</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">fill =</span> sex</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>  )) <span class="sc">+</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="at">position =</span> <span class="st">"dodge"</span>) <span class="sc">+</span></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>() <span class="sc">+</span></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Novel Respiratory Disease in California: New Infection Rate per 100,000</span><span class="sc">\n</span><span class="st">by Race/Ethnicity and Sex"</span>,</span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Race/Ethnicity"</span>,</span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Rate per 100,000"</span>,</span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">fill =</span> <span class="st">"Sex"</span>,</span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">caption =</span> <span class="st">"Source: SIM CA and LA Morbidity Files + CA DOF Population Estimates"</span></span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.title.position =</span> <span class="st">"plot"</span>,</span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">hjust =</span> <span class="fl">0.5</span>)</span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>`summarise()` has grouped output by 'race_ethnicity'. You can override using
+the `.groups` argument.</code></pre>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="milestone4_files/figure-html/unnamed-chunk-4-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(scales)</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>age_table2 <span class="ot">&lt;-</span> ca_id_rate <span class="sc">%&gt;%</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(age_cat, sex) <span class="sc">%&gt;%</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">rate =</span> (<span class="fu">sum</span>(new_infections) <span class="sc">/</span> <span class="fu">sum</span>(population)) <span class="sc">*</span> <span class="dv">100000</span>,</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>            <span class="at">.groups =</span> <span class="st">"drop"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> sex, <span class="at">values_from =</span> rate) <span class="sc">%&gt;%</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">Overall =</span> (Female <span class="sc">+</span> Male) <span class="sc">/</span> <span class="dv">2</span></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(age_cat)</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Define shared palette</span></span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>pal <span class="ot">&lt;-</span> <span class="fu">colorRampPalette</span>(<span class="fu">c</span>(<span class="st">"#ffe5e5"</span>, <span class="st">"#990000"</span>))(<span class="fu">nrow</span>(age_table2))</span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>age_table_color <span class="ot">&lt;-</span> age_table2 <span class="sc">%&gt;%</span></span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">Female =</span> <span class="fu">cell_spec</span>(<span class="fu">round</span>(Female, <span class="dv">1</span>), <span class="st">"html"</span>,</span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>                       <span class="at">background =</span> pal[<span class="fu">rank</span>(Female, <span class="at">ties.method =</span> <span class="st">"first"</span>)]),</span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">Male =</span> <span class="fu">cell_spec</span>(<span class="fu">round</span>(Male, <span class="dv">1</span>), <span class="st">"html"</span>,</span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a>                     <span class="at">background =</span> pal[<span class="fu">rank</span>(Male, <span class="at">ties.method =</span> <span class="st">"first"</span>)]),</span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a>    <span class="at">Overall =</span> <span class="fu">cell_spec</span>(<span class="fu">round</span>(Overall, <span class="dv">1</span>), <span class="st">"html"</span>,</span>
+<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a>                        <span class="at">background =</span> pal[<span class="fu">rank</span>(Overall, <span class="at">ties.method =</span> <span class="st">"first"</span>)])</span>
+<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a>caption_html <span class="ot">&lt;-</span> <span class="st">"&lt;span style='color:black; font-weight:bold; font-size:20px;'&gt;</span></span>
+<span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a><span class="st">Novel Respiratory Disease in California: New Infection Rate per 100,000&lt;br&gt;</span></span>
+<span id="cb6-27"><a href="#cb6-27" aria-hidden="true" tabindex="-1"></a><span class="st">by Age Group and Sex</span></span>
+<span id="cb6-28"><a href="#cb6-28" aria-hidden="true" tabindex="-1"></a><span class="st">&lt;/span&gt;"</span></span>
+<span id="cb6-29"><a href="#cb6-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-30"><a href="#cb6-30" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(age_table_color,</span>
+<span id="cb6-31"><a href="#cb6-31" aria-hidden="true" tabindex="-1"></a>      <span class="at">escape =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb6-32"><a href="#cb6-32" aria-hidden="true" tabindex="-1"></a>      <span class="at">format =</span> <span class="st">"html"</span>,</span>
+<span id="cb6-33"><a href="#cb6-33" aria-hidden="true" tabindex="-1"></a>      <span class="at">caption =</span> caption_html,</span>
+<span id="cb6-34"><a href="#cb6-34" aria-hidden="true" tabindex="-1"></a>      <span class="at">col.names =</span> <span class="fu">c</span>(<span class="st">"Age Group"</span>, <span class="st">"Female"</span>, <span class="st">"Male"</span>, <span class="st">"Overall"</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb6-35"><a href="#cb6-35" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable_styling</span>(<span class="at">full_width =</span> <span class="cn">FALSE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<table class="table caption-top table-sm table-striped small" data-quarto-postprocess="true">
+<caption><span style="color:black; font-weight:bold; font-size:20px;"> Novel Respiratory Disease in California: New Infection Rate per 100,000<br>
+by Age Group and Sex </span></caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;" data-quarto-table-cell-role="th">Age Group</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">Female</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">Male</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">Overall</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">0-17</td>
+<td style="text-align: left;"><span style="     border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: #FFE5E5 !important;">4008.2</span></td>
+<td style="text-align: left;"><span style="     border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: #FFE5E5 !important;">4116</span></td>
+<td style="text-align: left;"><span style="     border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: #FFE5E5 !important;">4062.1</span></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">18-49</td>
+<td style="text-align: left;"><span style="     border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: #BB4C4C !important;">13984.4</span></td>
+<td style="text-align: left;"><span style="     border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: #BB4C4C !important;">14859.9</span></td>
+<td style="text-align: left;"><span style="     border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: #BB4C4C !important;">14422.2</span></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">50-64</td>
+<td style="text-align: left;"><span style="     border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: #DD9898 !important;">7555.6</span></td>
+<td style="text-align: left;"><span style="     border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: #DD9898 !important;">7701.2</span></td>
+<td style="text-align: left;"><span style="     border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: #DD9898 !important;">7628.4</span></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">65+</td>
+<td style="text-align: left;"><span style="     border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: #990000 !important;">18892.2</span></td>
+<td style="text-align: left;"><span style="     border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: #990000 !important;">19370.2</span></td>
+<td style="text-align: left;"><span style="     border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: #990000 !important;">19131.2</span></td>
+</tr>
+</tbody>
+</table>
+
+
+</div>
+</div>
+<p>Interpretation: The age groups with the highest infection rate are those over 65 year of age followed by those 18-64 years. Given that the risk is does not strictly increase or decrease proportional with age which would be more likely to suggest a biological basis for difference in infection rate, behavioral differences between the age strata should be examined as part of selecting risk reduction stragies.</p>
 <ul>
 <li><p>For this milestone please make sure code for visualizations are included in the final file. Show your work by “echoing” code used in Rmd/Qmd file to create your tables and graphs. ```{r, echo = TRUE} in code chunk preferences.</p></li>
 <li><p>One print quality table as requested in scenario</p></li>

@@ -28,7 +28,7 @@ library(knitr)
 library(kableExtra)
 library(tibble)
 library(forcats)
-
+library(formattable)
 
 # Import and clean column names (this was cut and pasted from Milestone2 qmd)
 
@@ -111,9 +111,6 @@ sim_la_clean2 <- sim_la_clean1 %>%
     county = str_remove(county, regex("\\s*County$", ignore_case = TRUE)) %>% str_trim()
   )
 
-# joining morbidity data sets (copied from milestone 3)
-morbidity_all <- bind_rows(sim_ca_clean2, sim_la_clean2)
-
 #cleaning of population data set (copied from milestone 3)
 ca_pop_clean <- ca_pop %>%
   clean_names() %>%   
@@ -147,7 +144,15 @@ ca_pop_collapsed <- ca_pop_clean %>%
     population = sum(population, na.rm = TRUE),
     .groups = "drop"
   )
+```
 
+```{r}
+# joining morbidity data sets (copied from milestone 3)
+morbidity_all <- bind_rows(sim_ca_clean2, sim_la_clean2)
+
+```
+
+```{r aditional cleaning, include=FALSE}
 #additional cleaning of combine mortality data sets
 morbidity_collapsed<-morbidity_all%>%
   select(-dt_diagnosis)%>%
@@ -161,7 +166,9 @@ morbidity_collapsed<-morbidity_all%>%
     cumulative_severe = sum(cumulative_severe, na.rm = TRUE),
     .groups = "drop"
   )
+```
 
+```{r}
 # Join morbidity and population datasets into a new object
 ca_id_rate <- full_join(
   morbidity_collapsed,
@@ -169,38 +176,9 @@ ca_id_rate <- full_join(
   by = c("county", "sex", "race_ethnicity", "age_cat"))
 ```
 
-```{r}
-
-ca_id_rate %>%
-  group_by(race_ethnicity, sex) %>%
-  summarise(rate = (sum(new_infections) / sum(population)) * 100000) %>%
-  ggplot(aes(
-    x = fct_reorder(race_ethnicity, rate, .fun = max, .desc = FALSE),  # highest at top
-    y = rate,
-    fill = sex
-  )) +
-  geom_col(position = "dodge") +
-  coord_flip() +
-  labs(
-    title = "Novel Respiratory Disease in California: New Infection Rate per 100,000\nby Race/Ethnicity and Sex",
-    x = "Race/Ethnicity",
-    y = "Rate per 100,000",
-    fill = "Sex",
-    caption = "Source: SIM CA and LA Morbidity Files + CA DOF Population Estimates"
-  ) +
-  theme_minimal() +
-  theme(
-    plot.title.position = "plot",
-    plot.title = element_text(hjust = 0.5)
-  )
-
-
-```
-
-Interpretation: Infection rates for the novel respiratory disease in California show clear racial and ethnic disparities. American Indian or Alaska Native and White, Non-Hispanic populations experience the highest infection rates, followed by Black, Non-Hispanic and Hispanic populations. Native Hawaiian or Pacific Islander, Asian, and Multiracial populations have noticeably lower rates. Differences between males and females within each racial/ethnic group are present but relatively small compared with the larger disparities across groups.
+## Visualizations (at least one per group member)
 
 ```{r}
-
 table_data <- ca_id_rate %>%
   group_by(race_ethnicity, sex) %>%
   summarise(rate = (sum(new_infections) / sum(population)) * 100000,
@@ -238,7 +216,72 @@ table_data %>%
 
 ```
 
-## Visualizations (at least one per group member)
+Interpretation: Infection rates for the novel respiratory disease in California show clear racial and ethnic disparities. American Indian or Alaska Native and White, Non-Hispanic populations experience the highest infection rates, followed by Black, Non-Hispanic and Hispanic populations. Native Hawaiian or Pacific Islander, Asian, and Multiracial populations have noticeably lower rates. Differences between males and females within each racial/ethnic group are present but relatively small compared with the larger disparities across groups.
+
+```{r}
+ca_id_rate %>%
+  group_by(race_ethnicity, sex) %>%
+  summarise(rate = (sum(new_infections) / sum(population)) * 100000) %>%
+  ggplot(aes(
+    x = fct_reorder(race_ethnicity, rate, .fun = max, .desc = FALSE),  # highest at top
+    y = rate,
+    fill = sex
+  )) +
+  geom_col(position = "dodge") +
+  coord_flip() +
+  labs(
+    title = "Novel Respiratory Disease in California: New Infection Rate per 100,000\nby Race/Ethnicity and Sex",
+    x = "Race/Ethnicity",
+    y = "Rate per 100,000",
+    fill = "Sex",
+    caption = "Source: SIM CA and LA Morbidity Files + CA DOF Population Estimates"
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title.position = "plot",
+    plot.title = element_text(hjust = 0.5)
+  )
+```
+
+```{r}
+library(scales)
+age_table2 <- ca_id_rate %>%
+  group_by(age_cat, sex) %>%
+  summarise(rate = (sum(new_infections) / sum(population)) * 100000,
+            .groups = "drop") %>%
+  pivot_wider(names_from = sex, values_from = rate) %>%
+  mutate(
+    Overall = (Female + Male) / 2
+  ) %>%
+  arrange(age_cat)
+
+# Define shared palette
+pal <- colorRampPalette(c("#ffe5e5", "#990000"))(nrow(age_table2))
+
+age_table_color <- age_table2 %>%
+  mutate(
+    Female = cell_spec(round(Female, 1), "html",
+                       background = pal[rank(Female, ties.method = "first")]),
+    Male = cell_spec(round(Male, 1), "html",
+                     background = pal[rank(Male, ties.method = "first")]),
+    Overall = cell_spec(round(Overall, 1), "html",
+                        background = pal[rank(Overall, ties.method = "first")])
+  )
+
+caption_html <- "<span style='color:black; font-weight:bold; font-size:20px;'>
+Novel Respiratory Disease in California: New Infection Rate per 100,000<br>
+by Age Group and Sex
+</span>"
+
+kable(age_table_color,
+      escape = FALSE,
+      format = "html",
+      caption = caption_html,
+      col.names = c("Age Group", "Female", "Male", "Overall")) %>%
+  kable_styling(full_width = FALSE)
+```
+
+Interpretation: The age groups with the highest infection rate are those over 65 year of age followed by those 18-64 years. Given that the risk is does not strictly increase or decrease proportional with age which would be more likely to suggest a biological basis for difference in infection rate, behavioral differences between the age strata should be examined as part of selecting risk reduction stragies.
 
 -   For this milestone please make sure code for visualizations are included in the final file. Show your work by "echoing" code used in Rmd/Qmd file to create your tables and graphs. \`\`\`{r, echo = TRUE} in code chunk preferences.
 
