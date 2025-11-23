@@ -1,5 +1,6 @@
 ---
 title: "Milestone4"
+author: "Kosloski & Tonsing"
 format: html
 editor: visual
 ---
@@ -29,6 +30,7 @@ library(kableExtra)
 library(tibble)
 library(forcats)
 library(formattable)
+library(plotly)
 
 # Import and clean column names (this was cut and pasted from Milestone2 qmd)
 
@@ -194,7 +196,8 @@ table_data <- ca_id_rate %>%
     Overall = comma(round(Overall, 1)))
 
 caption_html <- "<span style='color:black; font-weight:bold; font-size:20px;'>
-Novel Respiratory Disease in California: New Infection Rate per 100,000\nby Race/Ethnicity and Sex
+Novel Respiratory Disease in California: 
+New Infection Rate per 100,000\nby Race/Ethnicity and Sex
 </span>"
 
 table_data %>%
@@ -218,7 +221,7 @@ table_data %>%
 
 Interpretation: Infection rates for the novel respiratory disease in California show clear racial and ethnic disparities. American Indian or Alaska Native and White, Non-Hispanic populations experience the highest infection rates, followed by Black, Non-Hispanic and Hispanic populations. Native Hawaiian or Pacific Islander, Asian, and Multiracial populations have noticeably lower rates. Differences between males and females within each racial/ethnic group are present but relatively small compared with the larger disparities across groups.
 
-```{r}
+```{r, warning=FALSE, message=FALSE}
 ca_id_rate %>%
   group_by(race_ethnicity, sex) %>%
   summarise(rate = (sum(new_infections) / sum(population)) * 100000) %>%
@@ -230,7 +233,8 @@ ca_id_rate %>%
   geom_col(position = "dodge") +
   coord_flip() +
   labs(
-    title = "Novel Respiratory Disease in California: New Infection Rate per 100,000\nby Race/Ethnicity and Sex",
+    title = "Novel Respiratory Disease in California: 
+    New Infection Rate per 100,000\nby Race/Ethnicity and Sex",
     x = "Race/Ethnicity",
     y = "Rate per 100,000",
     fill = "Sex",
@@ -243,8 +247,9 @@ ca_id_rate %>%
   )
 ```
 
+Interpretation:
+
 ```{r}
-library(scales)
 age_table2 <- ca_id_rate %>%
   group_by(age_cat, sex) %>%
   summarise(rate = (sum(new_infections) / sum(population)) * 100000,
@@ -256,7 +261,7 @@ age_table2 <- ca_id_rate %>%
   arrange(age_cat)
 
 # Define shared palette
-pal <- colorRampPalette(c("#ffe5e5", "#990000"))(nrow(age_table2))
+pal <- colorRampPalette(c("#FFEA00", "#FFC300","#FFA200","#FF7B00"))(nrow(age_table2))
 
 age_table_color <- age_table2 %>%
   mutate(
@@ -281,7 +286,33 @@ kable(age_table_color,
   kable_styling(full_width = FALSE)
 ```
 
-Interpretation: The age groups with the highest infection rate are those over 65 year of age followed by those 18-64 years. Given that the risk is does not strictly increase or decrease proportional with age which would be more likely to suggest a biological basis for difference in infection rate, behavioral differences between the age strata should be examined as part of selecting risk reduction stragies.
+Interpretation: The age groups with the highest infection rate are those over 65 year of age followed by those 18-64 years. Given that the risk is does not strictly increase or decrease proportional with age which would be more likely to suggest a biological basis for difference in infection rate, behavioral differences between the age strata should be examined as part of selecting risk reduction strategies.
+
+```{r, warning=FALSE, message=FALSE}
+age_plot<-ca_id_rate%>%
+  group_by(age_cat, county) %>%                
+  summarise(rate = sum(new_infections)/sum(population)*100000)
+
+plot_ly(
+  age_plot,
+  x = ~age_cat,
+  y = ~rate,
+  type = "box",
+  color = ~age_cat,
+  hoverinfo = "y+text",
+  text = ~paste("County:", county)
+)%>%
+  layout(
+    title = "Novel Respiratory Disease in California: Rates by Age Group and County",
+    yaxis = list(title = "Rate per 100,000"),
+    xaxis = list(title = "Age Group"),
+    boxmode = "group",
+    paper_bgcolor = "azure",
+    plot_bgcolor = "white"
+  )
+```
+
+Interpretation: While median values for infection rates vary between age groups, the spread within the age groups is quite wide and not normally distributed even when agregated at the county level. This suggests that individual level variations (perhaps due to underlying health conditions, behavioral patterns, etc.) may be more significant than age alone in influencing disease risk.
 
 -   For this milestone please make sure code for visualizations are included in the final file. Show your work by "echoing" code used in Rmd/Qmd file to create your tables and graphs. \`\`\`{r, echo = TRUE} in code chunk preferences.
 
