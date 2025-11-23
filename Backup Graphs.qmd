@@ -1,0 +1,273 @@
+## Cleaning and Joining data sets
+
+-   Join all datasets together
+
+-   Calculate any remaining data elements needed for analysis
+
+-   Show code used to create joined dataset, but please do not print full data frame output (showing data structure with `str()` is okay)
+
+-   Code used to import and clean data (milestones 2 and 3) can be included in the rmd/qmd but please use the option include=FALSE in order to prevent the code and any output from. Code chunk would look like `{r chunk_name, include=FALSE}`{style="font-family: Monaco, Menlo, Consolas, \"Courier New\", monospace; font-size: 0.75rem; border-radius: 6px; background-color: rgb(242, 244, 244); border: 1px solid rgb(232, 234, 236); padding: 0.125rem 0.25rem; color: rgb(199, 31, 35); text-size-adjust: auto;"}
+
+-   Utilize `warning=FALSE`{style="font-family: Monaco, Menlo, Consolas, \"Courier New\", monospace; font-size: 0.75rem; border-radius: 6px; background-color: rgb(242, 244, 244); border: 1px solid rgb(232, 234, 236); padding: 0.125rem 0.25rem; color: rgb(199, 31, 35); text-size-adjust: auto;"} and `message=FALSE`{style="font-family: Monaco, Menlo, Consolas, \"Courier New\", monospace; font-size: 0.75rem; border-radius: 6px; background-color: rgb(242, 244, 244); border: 1px solid rgb(232, 234, 236); padding: 0.125rem 0.25rem; color: rgb(199, 31, 35); text-size-adjust: auto;"} to suppress any warnings/messages that may be displaying from any chunks
+
+```{r import and clean, include=FALSE}
+# Import libraries
+
+library(readr)
+library(dplyr)
+library(janitor)
+library(scales)
+library(tidyverse)
+library(knitr)
+library(kableExtra)
+library(tibble)
+library(forcats)
+library(formattable)
+library(plotly)
+
+# Import and clean column names (this was cut and pasted from Milestone2 qmd)
+
+sim_ca <- read_csv("data/sim_novelid_CA.csv", show_col_types = FALSE) |> clean_names()
+sim_la <- read_csv("data/sim_novelid_LACounty.csv", show_col_types = FALSE) |> clean_names()
+ca_pop <- read_csv("data/ca_pop_2023.csv", show_col_types = FALSE) |> clean_names()
+
+sim_ca <- sim_ca %>% clean_names()
+sim_la <- sim_la %>% clean_names()
+ca_pop <- ca_pop %>% clean_names()
+
+#clean data (cut and pasted from milestone3 qmd)
+sim_la_clean1 <- sim_la %>%
+  mutate(county = "Los Angeles") %>%
+  rename(
+    dt_diagnosis = dt_dx, 
+    age_cat = age_category,
+    race_ethnicity = race_eth,
+    new_infections = dx_new,
+    cumulative_infected = infected_cumulative,
+    new_unrecovered = unrecovered_new,
+    cumulative_unrecovered = unrecovered_cumulative,
+    new_severe = severe_new,
+    cumulative_severe = severe_cumulative
+  ) %>%
+  select(
+    county, age_cat, sex, race_ethnicity, dt_diagnosis,
+    new_infections, cumulative_infected,
+    new_unrecovered, cumulative_unrecovered,
+    new_severe, cumulative_severe
+  )
+
+sim_ca_clean1 <- sim_ca %>%  
+  clean_names() %>%
+  mutate(
+    race_ethnicity = recode(race_ethnicity,
+      "1" = "White, Non-Hispanic",
+      "2" = "Black, Non-Hispanic",
+      "3" = "American Indian or Alaska Native, Non-Hispanic",
+      "4" = "Asian, Non-Hispanic",
+      "5" = "Native Hawaiian or Pacific Islander, Non-Hispanic",
+      "6" = "Multiracial (two or more of above races), Non-Hispanic",
+      "7" = "Hispanic (any race)",
+      "9" = "Unknown"),
+    sex = str_to_title(str_trim(sex)),
+    # Remove the word "County" and trim any trailing spaces in county names 
+    # to align with population data set
+    county = str_remove(county, regex("\\s*County$", ignore_case = TRUE)) %>% str_trim())
+
+sim_ca_clean2 <- sim_ca_clean1 %>%
+  select(-time_int)
+  
+# Clean and standardize LA Morbidity values
+
+sim_la_clean2 <- sim_la_clean1 %>%
+  mutate(
+    
+    # Convert SAS-style date (e.g., 23OCT2023) to YYYY-MM-DD
+    dt_diagnosis = as.Date(dt_diagnosis, format = "%d%b%Y"),
+    
+    race_ethnicity = str_trim(race_ethnicity),
+    
+    # Ensure consistent capitalization and remove stray spaces in race/ethnicity
+    race_ethnicity = str_trim(race_ethnicity),
+    race_ethnicity = recode(
+      race_ethnicity,
+      "Hispanic (Any Race)" = "Hispanic (any race)",
+      "American Indian Or Alaska Native, Non-Hispanic" = 
+      "American Indian or Alaska Native, Non-Hispanic", 
+      "Native Hawaiian Or Pacific Islander, Non-Hispanic" = 
+      "Native Hawaiian or Pacific Islander, Non-Hispanic", 
+      "Multiracial (Two Or More Of Above Races), Non-Hispanic" =
+      "Multiracial (two or more of above races), Non-Hispanic"),
+    
+    # Clean capitalization for sex variable
+    sex = str_to_title(sex),
+    
+    # Remove the word "County" and trim any trailing spaces in county names 
+    # to align with population data set
+    county = str_remove(county, regex("\\s*County$", ignore_case = TRUE)) %>% str_trim()
+  )
+
+#cleaning of population data set (copied from milestone 3)
+ca_pop_clean <- ca_pop %>%
+  clean_names() %>%   
+  rename(population = pop) %>%
+  mutate(
+    race_ethnicity = recode(
+      race7,
+      "WhiteTE NH" = "White, Non-Hispanic",   
+      "Black NH"   = "Black, Non-Hispanic",
+      "AIAN NH"    = "American Indian or Alaska Native, Non-Hispanic",
+      "Asian NH"   = "Asian, Non-Hispanic",
+      "NHPI NH"    = "Native Hawaiian or Pacific Islander, Non-Hispanic",
+      "MR NH"      = "Multiracial (two or more of above races), Non-Hispanic",
+      "Hispanic"   = "Hispanic (any race)"),
+    sex    = str_to_title(sex),      # FEMALE → Female
+    county = str_to_title(county)    # ALAMEDA COUNTY → Alameda County
+  ) %>%
+  
+  select(county, age_cat, sex, race_ethnicity, population)
+
+#combine 0-17 age froup to match county level data set
+ca_pop_collapsed <- ca_pop_clean %>%
+  mutate(
+    age_cat = case_when(
+      age_cat %in% c("0-4", "5-11", "12-17") ~ "0-17",
+      TRUE ~ age_cat  # keep other categories unchanged
+    )
+  ) %>%
+  group_by(county, sex, race_ethnicity, age_cat) %>%
+  summarise(
+    population = sum(population, na.rm = TRUE),
+    .groups = "drop"
+  )
+```
+
+```{r, include=FALSE}
+# joining morbidity data sets (copied from milestone 3)
+morbidity_all <- bind_rows(sim_ca_clean2, sim_la_clean2)
+
+```
+
+```{r aditional cleaning, include=FALSE}
+#additional cleaning of combine mortality data sets
+morbidity_collapsed<-morbidity_all%>%
+  select(-dt_diagnosis)%>%
+  group_by(county,sex,race_ethnicity,age_cat)%>%
+  summarise(
+    new_infections = sum(new_infections, na.rm = TRUE),
+    cumulative_infected = sum(cumulative_infected, na.rm = TRUE),
+    new_unrecovered = sum(new_unrecovered, na.rm = TRUE),
+    cumulative_unrecovered = sum(cumulative_unrecovered, na.rm = TRUE),
+    new_severe = sum(new_severe, na.rm = TRUE),
+    cumulative_severe = sum(cumulative_severe, na.rm = TRUE),
+    .groups = "drop"
+  )
+```
+
+```{r, include=FALSE}
+# Join morbidity and population datasets into a new object
+ca_id_rate <- full_join(
+  morbidity_collapsed,
+  ca_pop_collapsed,
+  by = c("county", "sex", "race_ethnicity", "age_cat"))
+```
+
+BACK UP TABLE - SALLY
+
+```{r}
+
+table_data <- ca_id_rate %>%
+  group_by(race_ethnicity, sex) %>%
+  summarise(rate = (sum(new_infections) / sum(population)) * 100000,
+            .groups = "drop") %>%
+  tidyr::pivot_wider(names_from = sex, values_from = rate) %>%
+  mutate(
+    Overall = (Female + Male) / 2,
+    race_ethnicity = fct_reorder(race_ethnicity, Overall, .desc = TRUE)) %>%
+  arrange(race_ethnicity) %>%
+  mutate(
+    Female = comma(round(Female, 1)),
+    Male = comma(round(Male, 1)),
+    Overall = comma(round(Overall, 1)))
+caption_html <- "<span style='color:black; font-weight:bold; font-size:20px;'>
+Novel Respiratory Disease in California: 
+New Infection Rate per 100,000\nby Race/Ethnicity and Sex
+</span>"
+table_data %>%
+  kable(
+    caption = caption_html,
+    col.names = c("Race/Ethnicity", "Female", "Male", "Overall"),
+    align = c("l", "r", "r", "r"),
+    escape = FALSE,       # <-- allows HTML in caption
+    format = "html") %>%
+  kable_styling(
+    bootstrap_options = c("striped", "hover", "condensed"),
+    full_width = FALSE,
+    position = "center",
+    font_size = 14) %>%
+  column_spec(1, bold = TRUE) %>%
+  row_spec(0, bold = TRUE, font_size = 16) %>%
+  add_header_above(c(" " = 1, "Infection Rate per 100,000" = 3),
+                   bold = TRUE, font_size = 16)
+```
+
+
+BACK UP GRAPH - SCHEREE
+
+```{r}
+
+age_plot<-ca_id_rate%>%
+  group_by(age_cat, county) %>%                
+  summarise(rate = sum(new_infections)/sum(population)*100000)
+
+plot_ly(
+  age_plot,
+  x = ~age_cat,
+  y = ~rate,
+  type = "box",
+  color = ~age_cat,
+  hoverinfo = "y+text",
+  text = ~paste("County:", county)
+)%>%
+  layout(
+    title = "Novel Respiratory Disease in California: Rates by Age Group and County",
+    yaxis = list(title = "Rate per 100,000"),
+    xaxis = list(title = "Age Group"),
+    boxmode = "group",
+    paper_bgcolor = "azure",
+    plot_bgcolor = "white"
+  )
+```
+
+Interpretation: While median values for infection rates vary between age groups, the spread within the age groups is quite wide and not normally distributed even when agregated at the county level. This suggests that individual level variations (perhaps due to underlying health conditions, behavioral patterns, etc.) may be more significant than age alone in influencing disease risk.
+
+BACKUP VISUAL
+```{r}
+
+
+age_rate_severity <- ca_id_rate %>%
+  group_by(age_cat) %>%
+  summarise(
+    infection_rate_100k = (sum(new_infections, na.rm = TRUE) / sum(population, na.rm = TRUE)) * 100000,
+    severe_rate_100k    = (sum(new_severe, na.rm = TRUE)      / sum(population, na.rm = TRUE)) * 100000
+  )
+
+age_rate_severity %>%
+  pivot_longer(cols = c(infection_rate_100k, severe_rate_100k),
+               names_to = "metric") %>%
+  ggplot(aes(x = age_cat, y = value, fill = metric)) +
+  geom_col(position = "dodge") +
+  scale_y_continuous(labels = scales::comma) +
+  scale_fill_manual(values = c("infection_rate_100k" = "salmon",
+                               "severe_rate_100k" = "steelblue"),
+                    labels = c("Infection rate per 100k", "Severe rate per 100k")) +
+  labs(
+    title = "Infection and Severe Case Rates per 100,000 by Age Group",
+    x = "Age Group",
+    y = "Rate per 100,000",
+    fill = "Metric",
+    caption = "Source: SIM CA + LA Morbidity Files"
+  ) +
+  theme_minimal()
+```
+
+Interpretation: Infection rates per 100,000 are highest among adults aged 65+ and 18–49, but severe case rates rise sharply with age and are highest in the 65+ group. Children 0–17 have both the lowest infection rates and the lowest severe case rates, indicating that older adults experience a disproportionate burden of severe disease even when infection occurs across all age groups.

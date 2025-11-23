@@ -6,9 +6,8 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="author" content="Kosloski &amp; Tonsing">
 
-<title>Milestone4</title>
+<title>Project Milestone 4</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -70,15 +69,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="milestone4_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
 <script src="milestone4_files/libs/kePrint-0.0.1/kePrint.js"></script>
 <link href="milestone4_files/libs/lightable-0.0.1/lightable.css" rel="stylesheet">
-<link href="milestone4_files/libs/htmltools-fill-0.5.8.1/fill.css" rel="stylesheet">
-<script src="milestone4_files/libs/htmlwidgets-1.6.4/htmlwidgets.js"></script>
-<script src="milestone4_files/libs/plotly-binding-4.9.2.2/plotly.js"></script>
-<script src="milestone4_files/libs/typedarray-0.1/typedarray.min.js"></script>
-<script src="milestone4_files/libs/jquery-3.5.1/jquery.min.js"></script>
-<link href="milestone4_files/libs/crosstalk-1.2.1/css/crosstalk.min.css" rel="stylesheet">
-<script src="milestone4_files/libs/crosstalk-1.2.1/js/crosstalk.min.js"></script>
-<link href="milestone4_files/libs/plotly-htmlwidgets-css-1.52.2/plotly-htmlwidgets.css" rel="stylesheet">
-<script src="milestone4_files/libs/plotly-main-1.52.2/plotly-latest.min.js"></script>
 
 
 </head>
@@ -91,7 +81,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Milestone4</h1>
+<h1 class="title">Project Milestone 4</h1>
 </div>
 
 
@@ -114,206 +104,79 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </header>
 
 
-<section id="cleaning-and-joining-data-sets" class="level2">
-<h2 class="anchored" data-anchor-id="cleaning-and-joining-data-sets">Cleaning and Joining data sets</h2>
-<ul>
-<li><p>Join all datasets together</p></li>
-<li><p>Calculate any remaining data elements needed for analysis</p></li>
-<li><p>Show code used to create joined dataset, but please do not print full data frame output (showing data structure with <code>str()</code> is okay)</p></li>
-<li><p>Code used to import and clean data (milestones 2 and 3) can be included in the rmd/qmd but please use the option include=FALSE in order to prevent the code and any output from. Code chunk would look like <code style="font-family: Monaco, Menlo, Consolas, &quot;Courier New&quot;, monospace; font-size: 0.75rem; border-radius: 6px; background-color: rgb(242, 244, 244); border: 1px solid rgb(232, 234, 236); padding: 0.125rem 0.25rem; color: rgb(199, 31, 35); text-size-adjust: auto;">{r chunk_name, include=FALSE}</code></p></li>
-<li><p>Utilize <code style="font-family: Monaco, Menlo, Consolas, &quot;Courier New&quot;, monospace; font-size: 0.75rem; border-radius: 6px; background-color: rgb(242, 244, 244); border: 1px solid rgb(232, 234, 236); padding: 0.125rem 0.25rem; color: rgb(199, 31, 35); text-size-adjust: auto;">warning=FALSE</code> and <code style="font-family: Monaco, Menlo, Consolas, &quot;Courier New&quot;, monospace; font-size: 0.75rem; border-radius: 6px; background-color: rgb(242, 244, 244); border: 1px solid rgb(232, 234, 236); padding: 0.125rem 0.25rem; color: rgb(199, 31, 35); text-size-adjust: auto;">message=FALSE</code> to suppress any warnings/messages that may be displaying from any chunks</p></li>
-</ul>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># joining morbidity data sets (copied from milestone 3)</span></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>morbidity_all <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(sim_ca_clean2, sim_la_clean2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Join morbidity and population datasets into a new object</span></span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>ca_id_rate <span class="ot">&lt;-</span> <span class="fu">full_join</span>(</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  morbidity_collapsed,</span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  ca_pop_collapsed,</span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">by =</span> <span class="fu">c</span>(<span class="st">"county"</span>, <span class="st">"sex"</span>, <span class="st">"race_ethnicity"</span>, <span class="st">"age_cat"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
+<section id="visualizations" class="level2">
+<h2 class="anchored" data-anchor-id="visualizations">Visualizations</h2>
 </section>
-<section id="visualizations-at-least-one-per-group-member" class="level2">
-<h2 class="anchored" data-anchor-id="visualizations-at-least-one-per-group-member">Visualizations (at least one per group member)</h2>
+<section id="graph" class="level2">
+<h2 class="anchored" data-anchor-id="graph">Graph</h2>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>table_data <span class="ot">&lt;-</span> ca_id_rate <span class="sc">%&gt;%</span></span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(race_ethnicity, sex) <span class="sc">%&gt;%</span></span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">rate =</span> (<span class="fu">sum</span>(new_infections) <span class="sc">/</span> <span class="fu">sum</span>(population)) <span class="sc">*</span> <span class="dv">100000</span>,</span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>            <span class="at">.groups =</span> <span class="st">"drop"</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>  tidyr<span class="sc">::</span><span class="fu">pivot_wider</span>(<span class="at">names_from =</span> sex, <span class="at">values_from =</span> rate) <span class="sc">%&gt;%</span></span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">Overall =</span> (Female <span class="sc">+</span> Male) <span class="sc">/</span> <span class="dv">2</span>,</span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">race_ethnicity =</span> <span class="fu">fct_reorder</span>(race_ethnicity, Overall, <span class="at">.desc =</span> <span class="cn">TRUE</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(race_ethnicity) <span class="sc">%&gt;%</span></span>
-<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">Female =</span> <span class="fu">comma</span>(<span class="fu">round</span>(Female, <span class="dv">1</span>)),</span>
-<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">Male =</span> <span class="fu">comma</span>(<span class="fu">round</span>(Male, <span class="dv">1</span>)),</span>
-<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">Overall =</span> <span class="fu">comma</span>(<span class="fu">round</span>(Overall, <span class="dv">1</span>)))</span>
-<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>caption_html <span class="ot">&lt;-</span> <span class="st">"&lt;span style='color:black; font-weight:bold; font-size:20px;'&gt;</span></span>
-<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a><span class="st">Novel Respiratory Disease in California: </span></span>
-<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a><span class="st">New Infection Rate per 100,000</span><span class="sc">\n</span><span class="st">by Race/Ethnicity and Sex</span></span>
-<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a><span class="st">&lt;/span&gt;"</span></span>
-<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>table_data <span class="sc">%&gt;%</span></span>
-<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>(</span>
-<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>    <span class="at">caption =</span> caption_html,</span>
-<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a>    <span class="at">col.names =</span> <span class="fu">c</span>(<span class="st">"Race/Ethnicity"</span>, <span class="st">"Female"</span>, <span class="st">"Male"</span>, <span class="st">"Overall"</span>),</span>
-<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>    <span class="at">align =</span> <span class="fu">c</span>(<span class="st">"l"</span>, <span class="st">"r"</span>, <span class="st">"r"</span>, <span class="st">"r"</span>),</span>
-<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a>    <span class="at">escape =</span> <span class="cn">FALSE</span>,       <span class="co"># &lt;-- allows HTML in caption</span></span>
-<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a>    <span class="at">format =</span> <span class="st">"html"</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable_styling</span>(</span>
-<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a>    <span class="at">bootstrap_options =</span> <span class="fu">c</span>(<span class="st">"striped"</span>, <span class="st">"hover"</span>, <span class="st">"condensed"</span>),</span>
-<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a>    <span class="at">full_width =</span> <span class="cn">FALSE</span>,</span>
-<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a>    <span class="at">position =</span> <span class="st">"center"</span>,</span>
-<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a>    <span class="at">font_size =</span> <span class="dv">14</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a>  <span class="fu">column_spec</span>(<span class="dv">1</span>, <span class="at">bold =</span> <span class="cn">TRUE</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a>  <span class="fu">row_spec</span>(<span class="dv">0</span>, <span class="at">bold =</span> <span class="cn">TRUE</span>, <span class="at">font_size =</span> <span class="dv">16</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_header_above</span>(<span class="fu">c</span>(<span class="st">" "</span> <span class="ot">=</span> <span class="dv">1</span>, <span class="st">"Infection Rate per 100,000"</span> <span class="ot">=</span> <span class="dv">3</span>),</span>
-<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a>                   <span class="at">bold =</span> <span class="cn">TRUE</span>, <span class="at">font_size =</span> <span class="dv">16</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output-display">
-<table class="table table-striped table-hover table-condensed caption-top table-sm small" data-quarto-postprocess="true">
-<caption><span style="color:black; font-weight:bold; font-size:20px;"> Novel Respiratory Disease in California: New Infection Rate per 100,000 by Race/Ethnicity and Sex </span></caption>
-<colgroup>
-<col style="width: 25%">
-<col style="width: 25%">
-<col style="width: 25%">
-<col style="width: 25%">
-</colgroup>
-<thead>
-<tr class="header">
-<th data-quarto-table-cell-role="th" style="text-align: left; empty-cells: hide; border-bottom: hidden;"></th>
-<th colspan="3" data-quarto-table-cell-role="th" style="text-align: center; border-bottom: hidden; padding-bottom: 0; padding-left: 3px; padding-right: 3px; font-weight: bold; font-size: 16px;"><div style="border-bottom: 1px solid #ddd; padding-bottom: 5px; ">
-Infection Rate per 100,000
-</div></th>
-</tr>
-<tr class="odd">
-<th data-quarto-table-cell-role="th" style="text-align: left; font-weight: bold; font-size: 16px;">Race/Ethnicity</th>
-<th data-quarto-table-cell-role="th" style="text-align: right; font-weight: bold; font-size: 16px;">Female</th>
-<th data-quarto-table-cell-role="th" style="text-align: right; font-weight: bold; font-size: 16px;">Male</th>
-<th data-quarto-table-cell-role="th" style="text-align: right; font-weight: bold; font-size: 16px;">Overall</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td style="text-align: left; font-weight: bold;">American Indian or Alaska Native, Non-Hispanic</td>
-<td style="text-align: right;">14,183.20</td>
-<td style="text-align: right;">13,791.40</td>
-<td style="text-align: right;">13,987.30</td>
-</tr>
-<tr class="even">
-<td style="text-align: left; font-weight: bold;">White, Non-Hispanic</td>
-<td style="text-align: right;">12,953.90</td>
-<td style="text-align: right;">12,734.80</td>
-<td style="text-align: right;">12,844.30</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left; font-weight: bold;">Black, Non-Hispanic</td>
-<td style="text-align: right;">12,099.90</td>
-<td style="text-align: right;">12,491.30</td>
-<td style="text-align: right;">12,295.60</td>
-</tr>
-<tr class="even">
-<td style="text-align: left; font-weight: bold;">Hispanic (any race)</td>
-<td style="text-align: right;">11,763.20</td>
-<td style="text-align: right;">12,482.60</td>
-<td style="text-align: right;">12,122.90</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left; font-weight: bold;">Native Hawaiian or Pacific Islander, Non-Hispanic</td>
-<td style="text-align: right;">10,948.50</td>
-<td style="text-align: right;">11,066.50</td>
-<td style="text-align: right;">11,007.50</td>
-</tr>
-<tr class="even">
-<td style="text-align: left; font-weight: bold;">Asian, Non-Hispanic</td>
-<td style="text-align: right;">8,713.60</td>
-<td style="text-align: right;">8,653.80</td>
-<td style="text-align: right;">8,683.70</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left; font-weight: bold;">Multiracial (two or more of above races), Non-Hispanic</td>
-<td style="text-align: right;">7,211.10</td>
-<td style="text-align: right;">7,234.30</td>
-<td style="text-align: right;">7,222.70</td>
-</tr>
-</tbody>
-</table>
-
-
-</div>
-</div>
-<p>Interpretation: Infection rates for the novel respiratory disease in California show clear racial and ethnic disparities. American Indian or Alaska Native and White, Non-Hispanic populations experience the highest infection rates, followed by Black, Non-Hispanic and Hispanic populations. Native Hawaiian or Pacific Islander, Asian, and Multiracial populations have noticeably lower rates. Differences between males and females within each racial/ethnic group are present but relatively small compared with the larger disparities across groups.</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>ca_id_rate <span class="sc">%&gt;%</span></span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(race_ethnicity, sex) <span class="sc">%&gt;%</span></span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">rate =</span> (<span class="fu">sum</span>(new_infections) <span class="sc">/</span> <span class="fu">sum</span>(population)) <span class="sc">*</span> <span class="dv">100000</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(</span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="fu">fct_reorder</span>(race_ethnicity, rate, <span class="at">.fun =</span> max, <span class="at">.desc =</span> <span class="cn">FALSE</span>),  <span class="co"># highest at top</span></span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> rate,</span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">fill =</span> sex</span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>  )) <span class="sc">+</span></span>
-<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="at">position =</span> <span class="st">"dodge"</span>) <span class="sc">+</span></span>
-<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>() <span class="sc">+</span></span>
-<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
-<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Novel Respiratory Disease in California: </span></span>
-<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a><span class="st">    New Infection Rate per 100,000</span><span class="sc">\n</span><span class="st">by Race/Ethnicity and Sex"</span>,</span>
-<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Race/Ethnicity"</span>,</span>
-<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Rate per 100,000"</span>,</span>
-<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">fill =</span> <span class="st">"Sex"</span>,</span>
-<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">caption =</span> <span class="st">"Source: SIM CA and LA Morbidity Files + CA DOF Population Estimates"</span></span>
-<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
-<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
-<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
-<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.title.position =</span> <span class="st">"plot"</span>,</span>
-<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">hjust =</span> <span class="fl">0.5</span>)</span>
-<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>ca_id_rate <span class="sc">%&gt;%</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(race_ethnicity, sex) <span class="sc">%&gt;%</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">rate =</span> (<span class="fu">sum</span>(new_infections) <span class="sc">/</span> <span class="fu">sum</span>(population)) <span class="sc">*</span> <span class="dv">100000</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="fu">fct_reorder</span>(race_ethnicity, rate, <span class="at">.fun =</span> max, <span class="at">.desc =</span> <span class="cn">FALSE</span>),  <span class="co"># highest at top</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> rate,</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">fill =</span> sex)) <span class="sc">+</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="at">position =</span> <span class="st">"dodge"</span>) <span class="sc">+</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>() <span class="sc">+</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Novel Respiratory Disease in California: </span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="st">    New Infection Rate per 100,000</span><span class="sc">\n</span><span class="st">by Race/Ethnicity and Sex, 2023"</span>,</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Race/Ethnicity"</span>,</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Rate per 100,000"</span>,</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">fill =</span> <span class="st">"Sex"</span>,</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">caption =</span> <span class="st">"Source: SIM CA and LA Morbidity Files + CA DOF Population Estimates"</span>) <span class="sc">+</span></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.title.position =</span> <span class="st">"plot"</span>,</span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">hjust =</span> <span class="fl">0.5</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="milestone4_files/figure-html/unnamed-chunk-4-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="milestone4_files/figure-html/unnamed-chunk-3-1.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
 </div>
-<p>Interpretation:</p>
+<p>Interpretation: Infection rates for the novel respiratory disease in California show clear racial and ethnic disparities. American Indian or Alaska Native and White, Non-Hispanic populations experience the highest infection rates, followed by Black, Non-Hispanic and Hispanic populations. Native Hawaiian or Pacific Islander, Asian, and Multiracial populations have noticeably lower rates. Differences between males and females within each racial/ethnic group are present but relatively small compared with the larger disparities across groups.</p>
+</section>
+<section id="table" class="level2">
+<h2 class="anchored" data-anchor-id="table">Table</h2>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>age_table2 <span class="ot">&lt;-</span> ca_id_rate <span class="sc">%&gt;%</span></span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(age_cat, sex) <span class="sc">%&gt;%</span></span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">rate =</span> (<span class="fu">sum</span>(new_infections) <span class="sc">/</span> <span class="fu">sum</span>(population)) <span class="sc">*</span> <span class="dv">100000</span>,</span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>            <span class="at">.groups =</span> <span class="st">"drop"</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> sex, <span class="at">values_from =</span> rate) <span class="sc">%&gt;%</span></span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">Overall =</span> (Female <span class="sc">+</span> Male) <span class="sc">/</span> <span class="dv">2</span></span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
-<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(age_cat)</span>
-<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Define shared palette</span></span>
-<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>pal <span class="ot">&lt;-</span> <span class="fu">colorRampPalette</span>(<span class="fu">c</span>(<span class="st">"#FFEA00"</span>, <span class="st">"#FFC300"</span>,<span class="st">"#FFA200"</span>,<span class="st">"#FF7B00"</span>))(<span class="fu">nrow</span>(age_table2))</span>
-<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>age_table_color <span class="ot">&lt;-</span> age_table2 <span class="sc">%&gt;%</span></span>
-<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">Female =</span> <span class="fu">cell_spec</span>(<span class="fu">round</span>(Female, <span class="dv">1</span>), <span class="st">"html"</span>,</span>
-<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>                       <span class="at">background =</span> pal[<span class="fu">rank</span>(Female, <span class="at">ties.method =</span> <span class="st">"first"</span>)]),</span>
-<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">Male =</span> <span class="fu">cell_spec</span>(<span class="fu">round</span>(Male, <span class="dv">1</span>), <span class="st">"html"</span>,</span>
-<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>                     <span class="at">background =</span> pal[<span class="fu">rank</span>(Male, <span class="at">ties.method =</span> <span class="st">"first"</span>)]),</span>
-<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>    <span class="at">Overall =</span> <span class="fu">cell_spec</span>(<span class="fu">round</span>(Overall, <span class="dv">1</span>), <span class="st">"html"</span>,</span>
-<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a>                        <span class="at">background =</span> pal[<span class="fu">rank</span>(Overall, <span class="at">ties.method =</span> <span class="st">"first"</span>)])</span>
-<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a>caption_html <span class="ot">&lt;-</span> <span class="st">"&lt;span style='color:black; font-weight:bold; font-size:20px;'&gt;</span></span>
-<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a><span class="st">Novel Respiratory Disease in California: New Infection Rate per 100,000&lt;br&gt;</span></span>
-<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a><span class="st">by Age Group and Sex</span></span>
-<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a><span class="st">&lt;/span&gt;"</span></span>
-<span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-29"><a href="#cb5-29" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(age_table_color,</span>
-<span id="cb5-30"><a href="#cb5-30" aria-hidden="true" tabindex="-1"></a>      <span class="at">escape =</span> <span class="cn">FALSE</span>,</span>
-<span id="cb5-31"><a href="#cb5-31" aria-hidden="true" tabindex="-1"></a>      <span class="at">format =</span> <span class="st">"html"</span>,</span>
-<span id="cb5-32"><a href="#cb5-32" aria-hidden="true" tabindex="-1"></a>      <span class="at">caption =</span> caption_html,</span>
-<span id="cb5-33"><a href="#cb5-33" aria-hidden="true" tabindex="-1"></a>      <span class="at">col.names =</span> <span class="fu">c</span>(<span class="st">"Age Group"</span>, <span class="st">"Female"</span>, <span class="st">"Male"</span>, <span class="st">"Overall"</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb5-34"><a href="#cb5-34" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable_styling</span>(<span class="at">full_width =</span> <span class="cn">FALSE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>age_table2 <span class="ot">&lt;-</span> ca_id_rate <span class="sc">%&gt;%</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(age_cat, sex) <span class="sc">%&gt;%</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">rate =</span> (<span class="fu">sum</span>(new_infections) <span class="sc">/</span> <span class="fu">sum</span>(population)) <span class="sc">*</span> <span class="dv">100000</span>,</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>            <span class="at">.groups =</span> <span class="st">"drop"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> sex, <span class="at">values_from =</span> rate) <span class="sc">%&gt;%</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">Overall =</span> (Female <span class="sc">+</span> Male) <span class="sc">/</span> <span class="dv">2</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(age_cat)</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Define shared palette</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>pal <span class="ot">&lt;-</span> <span class="fu">colorRampPalette</span>(<span class="fu">c</span>(<span class="st">"#FFEA00"</span>, <span class="st">"#FFC300"</span>,<span class="st">"#FFA200"</span>,<span class="st">"#FF7B00"</span>))(<span class="fu">nrow</span>(age_table2))</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>age_table_color <span class="ot">&lt;-</span> age_table2 <span class="sc">%&gt;%</span></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">Female =</span> <span class="fu">cell_spec</span>(<span class="fu">round</span>(Female, <span class="dv">1</span>), <span class="st">"html"</span>,</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>                       <span class="at">background =</span> pal[<span class="fu">rank</span>(Female, <span class="at">ties.method =</span> <span class="st">"first"</span>)]),</span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">Male =</span> <span class="fu">cell_spec</span>(<span class="fu">round</span>(Male, <span class="dv">1</span>), <span class="st">"html"</span>,</span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>                     <span class="at">background =</span> pal[<span class="fu">rank</span>(Male, <span class="at">ties.method =</span> <span class="st">"first"</span>)]),</span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>    <span class="at">Overall =</span> <span class="fu">cell_spec</span>(<span class="fu">round</span>(Overall, <span class="dv">1</span>), <span class="st">"html"</span>,</span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>                        <span class="at">background =</span> pal[<span class="fu">rank</span>(Overall, <span class="at">ties.method =</span> <span class="st">"first"</span>)])</span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>caption_html <span class="ot">&lt;-</span> <span class="st">"&lt;span style='color:black; font-weight:bold; font-size:20px;'&gt;</span></span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a><span class="st">Novel Respiratory Disease in California: New Infection Rate per 100,000&lt;br&gt;</span></span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a><span class="st">by Age Group and Sex</span></span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a><span class="st">&lt;/span&gt;"</span></span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(age_table_color,</span>
+<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a>      <span class="at">escape =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a>      <span class="at">format =</span> <span class="st">"html"</span>,</span>
+<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a>      <span class="at">caption =</span> caption_html,</span>
+<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a>      <span class="at">col.names =</span> <span class="fu">c</span>(<span class="st">"Age Group"</span>, <span class="st">"Female"</span>, <span class="st">"Male"</span>, <span class="st">"Overall"</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable_styling</span>(<span class="at">full_width =</span> <span class="cn">FALSE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <table class="table caption-top table-sm table-striped small" data-quarto-postprocess="true">
 <caption><span style="color:black; font-weight:bold; font-size:20px;"> Novel Respiratory Disease in California: New Infection Rate per 100,000<br>
@@ -329,27 +192,27 @@ by Age Group and Sex </span></caption>
 <tbody>
 <tr class="odd">
 <td style="text-align: left;">0-17</td>
-<td style="text-align: left;"><span style="     border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: #FFEA00 !important;">4008.2</span></td>
-<td style="text-align: left;"><span style="     border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: #FFEA00 !important;">4116</span></td>
-<td style="text-align: left;"><span style="     border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: #FFEA00 !important;">4062.1</span></td>
+<td style="text-align: left;"><span style="     border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: #FFEA00 !important;">129.3</span></td>
+<td style="text-align: left;"><span style="     border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: #FFEA00 !important;">132.8</span></td>
+<td style="text-align: left;"><span style="     border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: #FFEA00 !important;">131</span></td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">18-49</td>
-<td style="text-align: left;"><span style="     border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: #FFA200 !important;">13984.4</span></td>
-<td style="text-align: left;"><span style="     border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: #FFA200 !important;">14859.9</span></td>
-<td style="text-align: left;"><span style="     border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: #FFA200 !important;">14422.2</span></td>
+<td style="text-align: left;"><span style="     border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: #FFA200 !important;">451.1</span></td>
+<td style="text-align: left;"><span style="     border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: #FFA200 !important;">479.4</span></td>
+<td style="text-align: left;"><span style="     border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: #FFA200 !important;">465.2</span></td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">50-64</td>
-<td style="text-align: left;"><span style="     border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: #FFC300 !important;">7555.6</span></td>
-<td style="text-align: left;"><span style="     border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: #FFC300 !important;">7701.2</span></td>
-<td style="text-align: left;"><span style="     border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: #FFC300 !important;">7628.4</span></td>
+<td style="text-align: left;"><span style="     border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: #FFC300 !important;">243.7</span></td>
+<td style="text-align: left;"><span style="     border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: #FFC300 !important;">248.4</span></td>
+<td style="text-align: left;"><span style="     border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: #FFC300 !important;">246.1</span></td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">65+</td>
-<td style="text-align: left;"><span style="     border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: #FF7B00 !important;">18892.2</span></td>
-<td style="text-align: left;"><span style="     border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: #FF7B00 !important;">19370.2</span></td>
-<td style="text-align: left;"><span style="     border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: #FF7B00 !important;">19131.2</span></td>
+<td style="text-align: left;"><span style="     border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: #FF7B00 !important;">609.4</span></td>
+<td style="text-align: left;"><span style="     border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: #FF7B00 !important;">624.8</span></td>
+<td style="text-align: left;"><span style="     border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: #FF7B00 !important;">617.1</span></td>
 </tr>
 </tbody>
 </table>
@@ -357,55 +220,7 @@ by Age Group and Sex </span></caption>
 
 </div>
 </div>
-<p>Interpretation: The age groups with the highest infection rate are those over 65 year of age followed by those 18-64 years. Given that the risk is does not strictly increase or decrease proportional with age which would be more likely to suggest a biological basis for difference in infection rate, behavioral differences between the age strata should be examined as part of selecting risk reduction strategies.</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>age_plot<span class="ot">&lt;-</span>ca_id_rate<span class="sc">%&gt;%</span></span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(age_cat, county) <span class="sc">%&gt;%</span>                </span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">rate =</span> <span class="fu">sum</span>(new_infections)<span class="sc">/</span><span class="fu">sum</span>(population)<span class="sc">*</span><span class="dv">100000</span>)</span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_ly</span>(</span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>  age_plot,</span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">x =</span> <span class="sc">~</span>age_cat,</span>
-<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">y =</span> <span class="sc">~</span>rate,</span>
-<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">type =</span> <span class="st">"box"</span>,</span>
-<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">color =</span> <span class="sc">~</span>age_cat,</span>
-<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">hoverinfo =</span> <span class="st">"y+text"</span>,</span>
-<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">text =</span> <span class="sc">~</span><span class="fu">paste</span>(<span class="st">"County:"</span>, county)</span>
-<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>)<span class="sc">%&gt;%</span></span>
-<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">layout</span>(</span>
-<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Novel Respiratory Disease in California: Rates by Age Group and County"</span>,</span>
-<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">yaxis =</span> <span class="fu">list</span>(<span class="at">title =</span> <span class="st">"Rate per 100,000"</span>),</span>
-<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">xaxis =</span> <span class="fu">list</span>(<span class="at">title =</span> <span class="st">"Age Group"</span>),</span>
-<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">boxmode =</span> <span class="st">"group"</span>,</span>
-<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">paper_bgcolor =</span> <span class="st">"azure"</span>,</span>
-<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot_bgcolor =</span> <span class="st">"white"</span></span>
-<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output-display">
-<div class="plotly html-widget html-fill-item" id="htmlwidget-0df993334433020fbc84" style="width:100%;height:464px;"></div>
-<script type="application/json" data-for="htmlwidget-0df993334433020fbc84">{"x":{"visdat":{"8a01c74d4a9":["function () ","plotlyVisDat"]},"cur_data":"8a01c74d4a9","attrs":{"8a01c74d4a9":{"x":{},"y":{},"hoverinfo":"y+text","text":{},"color":{},"alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"box"}},"layout":{"margin":{"b":40,"l":60,"t":25,"r":10},"title":"Novel Respiratory Disease in California: Rates by Age Group and County","yaxis":{"domain":[0,1],"automargin":true,"title":"Rate per 100,000"},"xaxis":{"domain":[0,1],"automargin":true,"title":"Age Group","type":"category","categoryorder":"array","categoryarray":["0-17","18-49","50-64","65+"]},"boxmode":"group","paper_bgcolor":"azure","plot_bgcolor":"white","hovermode":"closest","showlegend":true},"source":"A","config":{"showSendToCloud":false},"data":[{"fillcolor":"rgba(102,194,165,0.5)","x":["0-17","0-17","0-17","0-17","0-17","0-17","0-17","0-17","0-17","0-17","0-17","0-17","0-17","0-17","0-17","0-17","0-17","0-17","0-17","0-17","0-17","0-17","0-17","0-17","0-17","0-17","0-17","0-17","0-17","0-17","0-17","0-17","0-17","0-17","0-17","0-17","0-17","0-17","0-17","0-17","0-17","0-17","0-17","0-17","0-17","0-17","0-17","0-17","0-17","0-17","0-17","0-17","0-17","0-17","0-17","0-17","0-17","0-17"],"y":[2860.1758447384518,4945.0549450549452,2222.5628448804414,3144.5786024628533,2617.8675816495106,7300.3932296119001,2712.4025938211589,3042.66530681625,2783.3368443227305,2733.5033471469555,2759.7187209765157,3111.4857436047791,17449.90316588277,8392.3419879360081,8129.9064821206939,9021.5542993703748,2857.3279771932098,3187.1701177425903,3045.966887966973,3187.3785297816389,2728.4316144419772,2592.7141450607155,3114.6454605699137,7891.310637477095,3120.1248049921996,2440.8848207475212,3248.5144256510634,2707.8625418842048,2616.428204982044,2961.6661745120136,2251.8518518518517,3492.063492063492,2786.5316516936227,6481.7459787759462,2233.2953112805426,8057.699912925199,3051.027141340714,3431.3440882511509,6387.2606858752333,3776.8933722121519,2880.7748523240853,2887.3286912638564,2989.0778306452435,3441.0296821644342,2790.6520513009145,3492.6470588235293,3162.9066999206439,6293.9777262458074,2653.1622680501141,6613.3074622038966,5988.9079519610577,6147.9701841926935,2955.8541266794628,8345.7412020093798,2941.4821744101446,2861.220199027196,3571.1140466754732,5719.7728790915162],"hoverinfo":["y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text"],"text":["County: Alameda","County: Alpine","County: Amador","County: Butte","County: Calaveras","County: Colusa","County: Contra Costa","County: Del Norte","County: El Dorado","County: Fresno","County: Glenn","County: Humboldt","County: Imperial","County: Inyo","County: Kern","County: Kings","County: Lake","County: Lassen","County: Los Angeles","County: Madera","County: Marin","County: Mariposa","County: Mendocino","County: Merced","County: Modoc","County: Mono","County: Monterey","County: Napa","County: Nevada","County: Orange","County: Placer","County: Plumas","County: Riverside","County: Sacramento","County: San Benito","County: San Bernardino","County: San Diego","County: San Francisco","County: San Joaquin","County: San Luis Obispo","County: San Mateo","County: Santa Barbara","County: Santa Clara","County: Santa Cruz","County: Shasta","County: Sierra","County: Siskiyou","County: Solano","County: Sonoma","County: Stanislaus","County: Sutter","County: Tehama","County: Trinity","County: Tulare","County: Tuolumne","County: Ventura","County: Yolo","County: Yuba"],"type":"box","name":"0-17","marker":{"color":"rgba(102,194,165,1)","line":{"color":"rgba(102,194,165,1)"}},"line":{"color":"rgba(102,194,165,1)"},"xaxis":"x","yaxis":"y","frame":null},{"fillcolor":"rgba(252,141,98,0.5)","x":["18-49","18-49","18-49","18-49","18-49","18-49","18-49","18-49","18-49","18-49","18-49","18-49","18-49","18-49","18-49","18-49","18-49","18-49","18-49","18-49","18-49","18-49","18-49","18-49","18-49","18-49","18-49","18-49","18-49","18-49","18-49","18-49","18-49","18-49","18-49","18-49","18-49","18-49","18-49","18-49","18-49","18-49","18-49","18-49","18-49","18-49","18-49","18-49","18-49","18-49","18-49","18-49","18-49","18-49","18-49","18-49","18-49","18-49"],"y":[10968.442256933986,12532.637075718014,10240.274599542334,11864.615890771509,11602.683031254461,26902.713434811383,11271.199060934161,13644.948064211521,13297.545770823166,11133.131999496665,12234.910277324632,10760.942982817416,58216.133695402525,29449.639736317644,32450.52103463839,29406.99623533291,13436.940673156678,10945.205479452055,10829.30742289007,14359.595234892306,11885.348050560797,12721.44741801734,12643.286448974533,30019.804158873365,13699.115044247786,11346.863468634687,12958.891652625103,12142.378719739738,12228.095758901445,10843.52212498552,11408.534365479316,15848.331294775468,11162.114204264481,24531.781181365477,10483.064170358724,28761.122462089344,10287.895985966361,11357.270300679318,24576.338798944504,13593.041773857651,10651.531245600789,11106.324573970367,10746.260717118943,11375.9665086078,11310.20181664184,14966.740576496673,13622.183708838822,23296.571862659002,11242.569370050624,26060.642249964811,24809.178861393357,25938.609313008983,8165.4108988960934,31334.041304801114,11519.788918205804,11188.879082082965,12123.31447682072,22185.266630016493],"hoverinfo":["y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text"],"text":["County: Alameda","County: Alpine","County: Amador","County: Butte","County: Calaveras","County: Colusa","County: Contra Costa","County: Del Norte","County: El Dorado","County: Fresno","County: Glenn","County: Humboldt","County: Imperial","County: Inyo","County: Kern","County: Kings","County: Lake","County: Lassen","County: Los Angeles","County: Madera","County: Marin","County: Mariposa","County: Mendocino","County: Merced","County: Modoc","County: Mono","County: Monterey","County: Napa","County: Nevada","County: Orange","County: Placer","County: Plumas","County: Riverside","County: Sacramento","County: San Benito","County: San Bernardino","County: San Diego","County: San Francisco","County: San Joaquin","County: San Luis Obispo","County: San Mateo","County: Santa Barbara","County: Santa Clara","County: Santa Cruz","County: Shasta","County: Sierra","County: Siskiyou","County: Solano","County: Sonoma","County: Stanislaus","County: Sutter","County: Tehama","County: Trinity","County: Tulare","County: Tuolumne","County: Ventura","County: Yolo","County: Yuba"],"type":"box","name":"18-49","marker":{"color":"rgba(252,141,98,1)","line":{"color":"rgba(252,141,98,1)"}},"line":{"color":"rgba(252,141,98,1)"},"xaxis":"x","yaxis":"y","frame":null},{"fillcolor":"rgba(141,160,203,0.5)","x":["50-64","50-64","50-64","50-64","50-64","50-64","50-64","50-64","50-64","50-64","50-64","50-64","50-64","50-64","50-64","50-64","50-64","50-64","50-64","50-64","50-64","50-64","50-64","50-64","50-64","50-64","50-64","50-64","50-64","50-64","50-64","50-64","50-64","50-64","50-64","50-64","50-64","50-64","50-64","50-64","50-64","50-64","50-64","50-64","50-64","50-64","50-64","50-64","50-64","50-64","50-64","50-64","50-64","50-64","50-64","50-64","50-64","50-64"],"y":[5734.8468705809428,4330.7086614173231,4956.0153636476271,5425.454545454545,6232.2326700196809,14688.183807439826,5876.4091344421895,6612.8328240942819,5814.9578294888734,5714.9937072467737,5741.0163725281736,6451.014062282452,31604.338333685471,21409.997110661658,17235.52020419369,13916.024798046214,6366.2433428922568,7965.860597439545,5924.788800489694,6818.7265319165945,5795.72199916932,7346.5592064476132,6315.1796060254919,16069.891347339521,6997.2826086956529,6495.0038431975399,6789.5384528339255,5844.6296225183369,5757.2480560276017,5763.9217825240303,5320.7295829490731,6962.2051719238425,5934.2816265238316,13220.52754351337,5570.2917771883294,15796.494991873195,5791.3868091692866,6179.673789614948,14129.770058708416,7909.7627717566957,6207.3310188513869,6206.8558617027547,6072.4483945748179,6515.5926026766074,5602.4844720496894,6807.8668683812402,6220.9001551991723,12463.068077333301,6096.4874613534867,13916.47425407429,13715.740965316518,12357.332875654338,4286.1645130791048,17304.499595589801,6001.0509721492381,5842.5506690713719,6238.8855957320684,13488.334413480232],"hoverinfo":["y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text"],"text":["County: Alameda","County: Alpine","County: Amador","County: Butte","County: Calaveras","County: Colusa","County: Contra Costa","County: Del Norte","County: El Dorado","County: Fresno","County: Glenn","County: Humboldt","County: Imperial","County: Inyo","County: Kern","County: Kings","County: Lake","County: Lassen","County: Los Angeles","County: Madera","County: Marin","County: Mariposa","County: Mendocino","County: Merced","County: Modoc","County: Mono","County: Monterey","County: Napa","County: Nevada","County: Orange","County: Placer","County: Plumas","County: Riverside","County: Sacramento","County: San Benito","County: San Bernardino","County: San Diego","County: San Francisco","County: San Joaquin","County: San Luis Obispo","County: San Mateo","County: Santa Barbara","County: Santa Clara","County: Santa Cruz","County: Shasta","County: Sierra","County: Siskiyou","County: Solano","County: Sonoma","County: Stanislaus","County: Sutter","County: Tehama","County: Trinity","County: Tulare","County: Tuolumne","County: Ventura","County: Yolo","County: Yuba"],"type":"box","name":"50-64","marker":{"color":"rgba(141,160,203,1)","line":{"color":"rgba(141,160,203,1)"}},"line":{"color":"rgba(141,160,203,1)"},"xaxis":"x","yaxis":"y","frame":null},{"fillcolor":"rgba(231,138,195,0.5)","x":["65+","65+","65+","65+","65+","65+","65+","65+","65+","65+","65+","65+","65+","65+","65+","65+","65+","65+","65+","65+","65+","65+","65+","65+","65+","65+","65+","65+","65+","65+","65+","65+","65+","65+","65+","65+","65+","65+","65+","65+","65+","65+","65+","65+","65+","65+","65+","65+","65+","65+","65+","65+","65+","65+","65+","65+","65+","65+"],"y":[15076.064986962492,17341.040462427747,13462.704669496665,18813.340703887967,16750.147318797877,36712.657468506302,15021.875119929384,15111.695137976347,15348.32622463487,15752.927764535185,14900.314795383001,16150.317856280681,66592.787377911343,41649.777057154439,42579.474269656341,44035.644366434892,16522.012578616352,19696.969696969696,15150.687093117907,18586.78955453149,15027.548424354991,17212.649119484948,15602.86928313611,39909.318034607197,20709.793351302786,15062.761506276151,17577.998613357984,13468.973199659262,14003.014219251687,14855.412502442034,14846.601210237573,18325.8642765685,15666.065109602998,32222.55256248665,15245.714285714284,38946.481769817285,15588.875241619704,15682.409364331004,33470.968232977197,21540.592687874141,15035.031510755905,15097.195554372047,15846.508361796848,16805.276742185259,14738.273646036107,19617.224880382775,16832.178920136863,31100.799109852316,16227.331668892373,34699.256803576041,31213.611075171433,31106.959364782811,12862.029646522236,43573.661945926062,15750.604535651264,15174.53741676282,17757.788351335392,31164.673759533001],"hoverinfo":["y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text","y+text"],"text":["County: Alameda","County: Alpine","County: Amador","County: Butte","County: Calaveras","County: Colusa","County: Contra Costa","County: Del Norte","County: El Dorado","County: Fresno","County: Glenn","County: Humboldt","County: Imperial","County: Inyo","County: Kern","County: Kings","County: Lake","County: Lassen","County: Los Angeles","County: Madera","County: Marin","County: Mariposa","County: Mendocino","County: Merced","County: Modoc","County: Mono","County: Monterey","County: Napa","County: Nevada","County: Orange","County: Placer","County: Plumas","County: Riverside","County: Sacramento","County: San Benito","County: San Bernardino","County: San Diego","County: San Francisco","County: San Joaquin","County: San Luis Obispo","County: San Mateo","County: Santa Barbara","County: Santa Clara","County: Santa Cruz","County: Shasta","County: Sierra","County: Siskiyou","County: Solano","County: Sonoma","County: Stanislaus","County: Sutter","County: Tehama","County: Trinity","County: Tulare","County: Tuolumne","County: Ventura","County: Yolo","County: Yuba"],"type":"box","name":"65+","marker":{"color":"rgba(231,138,195,1)","line":{"color":"rgba(231,138,195,1)"}},"line":{"color":"rgba(231,138,195,1)"},"xaxis":"x","yaxis":"y","frame":null}],"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.20000000000000001,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
-</div>
-</div>
-<p>Interpretation: While median values for infection rates vary between age groups, the spread within the age groups is quite wide and not normally distributed even when agregated at the county level. This suggests that individual level variations (perhaps due to underlying health conditions, behavioral patterns, etc.) may be more significant than age alone in influencing disease risk.</p>
-<ul>
-<li><p>For this milestone please make sure code for visualizations are included in the final file. Show your work by “echoing” code used in Rmd/Qmd file to create your tables and graphs. ```{r, echo = TRUE} in code chunk preferences.</p></li>
-<li><p>One print quality table as requested in scenario</p></li>
-<li><p>One print quality plot or chart as requested in scenario</p></li>
-<li><p>For groups of 3, one additional print quality table or plot of your choice (can support the requested data in the scenario, or answer a different question using the same data sources)</p></li>
-<li><p>For each visual, include</p>
-<ul>
-<li><p>Code used to generate visual</p></li>
-<li><p>Legend (if necessary)</p></li>
-<li><p>1-2 sentence interpretation</p></li>
-<li><p>NOTE:</p>
-<ul>
-<li><p>Please make sure the visual can stand-alone, meaning it includes enough information in title, legend, and footnote so that a person who sees only the visualization could understand what is being presented.</p></li>
-<li><p>Please also make sure column names, axis labels, and any other labels are meaningful and not just the name of the variable (ex: “County” rather than “county_name”)</p></li>
-</ul></li>
-</ul></li>
-</ul>
-</section>
-<section id="section" class="level2">
-<h2 class="anchored" data-anchor-id="section"></h2>
+<p>Interpretation: The age groups with the highest infection rate are those over 65 year of age followed by those 18-49 years. Given that the risk does not strictly increase or decrease proportional with age which would be more likely to suggest a biological basis for difference in infection rate, behavioral differences between the age strata should be examined as part of selecting risk reduction strategies.</p>
 </section>
 
 </main>
