@@ -5,6 +5,8 @@ format: html
 editor: visual
 ---
 
+## Joining data sets
+
 ```{r import and clean, include=FALSE}
 # Import libraries
 
@@ -136,7 +138,7 @@ ca_pop_collapsed <- ca_pop_clean %>%
   )
 ```
 
-```{r, include=FALSE}
+```{r}
 # joining morbidity data sets (copied from milestone 3)
 morbidity_all <- bind_rows(sim_ca_clean2, sim_la_clean2)
 
@@ -158,7 +160,7 @@ morbidity_collapsed<-morbidity_all%>%
   )
 ```
 
-```{r, include=FALSE}
+```{r}
 # Join morbidity and population datasets into a new object
 ca_id_rate <- full_join(
   morbidity_all,
@@ -169,7 +171,7 @@ ca_id_rate <- full_join(
 
 ## Visualizations
 
-## Graph
+### Graph
 
 ```{r, warning=FALSE, message=FALSE}
 ca_id_rate %>%
@@ -196,7 +198,7 @@ ca_id_rate %>%
 
 Interpretation: Infection rates for the novel respiratory disease in California show clear racial and ethnic disparities. American Indian or Alaska Native and White, Non-Hispanic populations experience the highest infection rates, followed by Black, Non-Hispanic and Hispanic populations. Native Hawaiian or Pacific Islander, Asian, and Multiracial populations have noticeably lower rates. Differences between males and females within each racial/ethnic group are present but relatively small compared with the larger disparities across groups.
 
-## Table
+### Table
 
 ```{r}
 age_table2 <- ca_id_rate %>%
