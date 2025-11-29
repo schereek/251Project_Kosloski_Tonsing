@@ -1,0 +1,73 @@
+---
+title: "Milestone 6"
+author: "Kosloski & Tonsing"
+format: html
+editor: visual
+---
+
+**Milestone 6 Rubric (note - Max 1,000 words):**
+
+**Include 2+ visualizations (based on group size): 20pts**
+
+*- 1 (one) print quality table as requested in scenario\
+- 1 (one) print quality plot or chart as requested in scenario,\
+- 1 (one) additional print quality table or plot of your choice (can support the requested data in the scenario, or answer a different question using the same data sources).\
+\
+Visualizations should have clear titles, column/axis labels, legends (if applicable), footnotes (if applicable).\
+\
+Visualizations should also be relevant to the scenario and should support any conclusions drawn in the report.\
+\
+18 pts for visualizations\
+2 pts for visualizations being cohesive (same text formatting, coloring, etc).*
+
+***Problem statement 5pts***
+
+*Include 1-2 paragraphs describing the scenario that your team is aiming to address. This can be similar to the scenario text, but please phrase in your own words.*
+
+In this project, we are acting as epidemiologists at the California Department of Public Health responding to a simulated outbreak of a novel infectious respiratory disease in 2023. We have access to weekly case data for all California counties (including a separate file for Los Angeles County) with information on age group, sex, race/ethnicity, and county, as well as 2023 population estimates for the same demographic strata. Our task is to describe the course of the outbreak and understand how the burden of disease is distributed across demographic and geographic groups.
+
+Our supervisors want to know whether certain populations in California are being disproportionately affected and how prevention and treatment resources should be allocated in response. Using the joined morbidity and population datasets, we focus on infection rates and counts by race/ethnicity, age group, sex, and county to identify which groups and areas are experiencing the highest burden of disease. The goal of this analysis is to generate clear, interpretable tables and figures that can guide public health decision-making about where to prioritize outreach, testing, and clinical resources during this outbreak.
+
+***Methods 5pts***
+
+*Describe data sources, methods used, strategies for data cleaning, creating new variables, decisions team made about the data, and additional wrangling done for visualizations.*
+
+### **Methods**
+
+We conducted a descriptive epidemiologic analysis using three datasets provided for Scenario 1, which simulate a novel infectious respiratory disease outbreak in California in 2023. Dataset 1 (sim_novelid_CA.csv) contains weekly case counts and case severity for all California counties except Los Angeles County. Dataset 2 (sim_novelid_LACounty.csv) provides equivalent weekly morbidity data for Los Angeles County. Dataset 3 (ca_pop_2023.csv) includes 2023 population estimates by county, age category, sex, and race/ethnicity.
+
+### **Data Cleaning and Harmonization**
+
+Following the procedures completed in Milestones 2–4, we cleaned and standardized variable names, demographic categories, and county identifiers across all datasets. We recoded age groups, race/ethnicity categories, and sex to ensure consistent formatting, resolved duplicate or inconsistent labels, and removed records with missing or implausible demographic identifiers. Weekly case counts and severity levels were aggregated as required for merging.
+
+### **Merging Morbidity and Population Data**
+
+We combined the CA morbidity dataset with the LA County dataset to create a single statewide morbidity dataset. We then merged this file with the 2023 statewide population dataset using county, age category, sex, and race/ethnicity as joining keys. This produced a final analytic dataset containing both morbidity and population denominators for all relevant strata in California.
+
+### **Creation of Analytic Variables**
+
+We generated total case counts for each demographic and geographic stratum and created corresponding incidence rates per 100,000 population. Where relevant, we also summarized case severity categories. Continuous variables were inspected for outliers, and categorical variables were checked for completeness.
+
+### **Statistical Analysis**
+
+Our analysis focused on descriptive measures, including counts, proportions, and incidence rates. All analyses were performed in R (version X.X) using the tidyverse suite of packages. We created at least one publication-ready table and one graph, as required by the project rubric, to summarize the distribution of cases and rates across demographic or county-level strata. These outputs were designed to highlight populations experiencing disproportionately high burden during the outbreak.
+
+### **Ethical Considerations**
+
+Because this dataset is simulated and contains no identifiable information, no human subjects review was required.
+
+***Results 5pts***
+
+*Describe the results of your analysis, including what is displayed in the visualizations. (Note: no statistical testing is needed)*
+
+***Discussion 5pts***
+
+*Provide interpretation of results and what they tell your team about the given scenario.*
+
+***Uniform theme throughout document 10pts***
+
+*Final html output should all be uniform in format, coloring, text style (it should not look like multiple people have contributed to it)*
+
+***Html output published on RPubs 10pts***
+
+*Final outputs should include all necessary code to generate html output. No excess codes or unnecessary comments should be included. For html, make sure no code is printed so that it looks like a polished report.*
