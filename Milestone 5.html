@@ -36,6 +36,16 @@ ul.task-list li input[type="checkbox"] {
 <link href="Milestone 5_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
 <script src="Milestone 5_files/libs/kePrint-0.0.1/kePrint.js"></script>
 <link href="Milestone 5_files/libs/lightable-0.0.1/lightable.css" rel="stylesheet">
+<link href="Milestone 5_files/libs/htmltools-fill-0.5.8.1/fill.css" rel="stylesheet">
+<script src="Milestone 5_files/libs/htmlwidgets-1.6.4/htmlwidgets.js"></script>
+<link href="Milestone 5_files/libs/datatables-css-0.0.0/datatables-crosstalk.css" rel="stylesheet">
+<script src="Milestone 5_files/libs/datatables-binding-0.33/datatables.js"></script>
+<script src="Milestone 5_files/libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<link href="Milestone 5_files/libs/dt-core-1.13.6/css/jquery.dataTables.min.css" rel="stylesheet">
+<link href="Milestone 5_files/libs/dt-core-1.13.6/css/jquery.dataTables.extra.css" rel="stylesheet">
+<script src="Milestone 5_files/libs/dt-core-1.13.6/js/jquery.dataTables.min.js"></script>
+<link href="Milestone 5_files/libs/crosstalk-1.2.1/css/crosstalk.min.css" rel="stylesheet">
+<script src="Milestone 5_files/libs/crosstalk-1.2.1/js/crosstalk.min.js"></script>
 
 
 </head>
@@ -87,7 +97,7 @@ Visualizations should also be relevant to the scenario and should support any co
 <p><strong><em>Problem statement 5pts</em></strong></p>
 <p><em>Include 1-2 paragraphs describing the scenario that your team is aiming to address. This can be similar to the scenario text, but please phrase in your own words.</em></p>
 <p>For this project, we worked within the scenario of a statewide public health response to a simulated outbreak of a novel respiratory pathogen in California in 2023. The available data included weekly morbidity counts for all counties (with Los Angeles County provided separately) and 2023 population estimates for the same demographic strata. These datasets allowed us to examine disease occurrence by age group, sex, race/ethnicity, and county.</p>
-<p>The primary objective of our analysis was to describe how infections were distributed across demographic and geographic groups. By calculating case counts and incidence rates for key populations, we aimed to identify disparities in disease burden and provide evidence to guide resource allocation during the outbreak. This descriptive epidemiologic assessment supports understanding which communities may be most affected and where public health interventions may need to be concentrated.</p>
+<p>The primary objective of our analysis was to describe how infections were distributed across demographic and geographic groups. By calculating case counts and incidence rates for key populations, we aimed to identify disparities in disease burden and provide evidence to guide resource allocation during the outbreak. This descriptive epidemiologic assessment supports understanding which communities and demographic groups may be most affected and where public health interventions may need to be concentrated.</p>
 <p><strong><em>Methods 5pts</em></strong></p>
 <p><em>Describe data sources, methods used, strategies for data cleaning, creating new variables, decisions team made about the data, and additional wrangling done for visualizations.</em></p>
 <p>We used three datasets provided for Scenario 1: weekly morbidity data for all California counties except Los Angeles, a parallel morbidity file for Los Angeles County, and 2023 population estimates for all demographic strata. Together, these sources enabled statewide analysis of new infections and incidence rates by age, sex, race/ethnicity, and county.</p>
@@ -97,7 +107,8 @@ Visualizations should also be relevant to the scenario and should support any co
 <p><strong><em>Results 5pts</em></strong></p>
 <p><em>Describe the results of your analysis, including what is displayed in the visualizations. (Note: no statistical testing is needed)</em></p>
 <p>Our analysis revealed clear patterns in the distribution of new infections across demographic groups in California. After merging morbidity and population data, we calculated incidence rates per 100,000 population, which were summarized by race/ethnicity and sex in the primary visualization. This horizontal bar chart showed notable disparities: American Indian or Alaska Native and White, Non-Hispanic populations had the highest infection rates, followed by Black and Hispanic populations. Asian, Native Hawaiian or Pacific Islander, and Multiracial groups showed substantially lower rates. Differences between males and females within each racial/ethnic group were relatively small compared with the wider disparities across groups.</p>
-<p>We also created a print-quality table summarizing infection rates by age group and sex. Adults aged 65 and older experienced the highest infection rates overall, followed by adults aged 18–49. Rates were lower among those aged 50–64 and lowest among children ages 0–17. The table used color shading to highlight relative magnitudes and clearly demonstrated the gradient of infection burden across age groups. Together, the table and visualization provide a cohesive summary of how both racial/ethnic identity and age shape the distribution of infections in this simulated outbreak.</p>
+<p>We created a print-quality table summarizing infection rates by age group and sex. Adults aged 65 and older experienced the highest infection rates overall, followed by adults aged 18–49. Rates were lower among those aged 50–64 and lowest among children ages 0–17. The table used color gradient to highlight relative magnitudes and clearly demonstrated the gradient of infection burden across age groups.</p>
+<p>We also created an interactive table that displays new and severe infection rates by county. This table uses the same color gradient as the age table to illustrate the relative magnitudes. For this table the color gradient is based on the infection rate quantile with the darkest pink being the 4th quantile and white being the 1st quantile. Together, the two tables and the visualization provide a cohesive summary of how racial/ethnic identity, age, and county shape the distribution of infections in this simulated outbreak.</p>
 <div class="cell">
 <div class="cell-output-display">
 <div>
@@ -124,40 +135,55 @@ by Age Group and Sex </span></caption>
 <tbody>
 <tr class="odd">
 <td style="text-align: left;">0-17</td>
-<td style="text-align: left;"><span style="     border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: #FFEA00 !important;">129.3</span></td>
-<td style="text-align: left;"><span style="     border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: #FFEA00 !important;">132.8</span></td>
-<td style="text-align: left;"><span style="     border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: #FFEA00 !important;">131</span></td>
+<td style="text-align: left;"><span style="     border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: #FFFFFF !important;">129.3</span></td>
+<td style="text-align: left;"><span style="     border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: #FFFFFF !important;">132.8</span></td>
+<td style="text-align: left;"><span style="     border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: #FFFFFF !important;">131</span></td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">18-49</td>
-<td style="text-align: left;"><span style="     border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: #FFA200 !important;">451.1</span></td>
-<td style="text-align: left;"><span style="     border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: #FFA200 !important;">479.4</span></td>
-<td style="text-align: left;"><span style="     border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: #FFA200 !important;">465.2</span></td>
+<td style="text-align: left;"><span style="     border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: #FBB8B0 !important;">451.1</span></td>
+<td style="text-align: left;"><span style="     border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: #FBB8B0 !important;">479.4</span></td>
+<td style="text-align: left;"><span style="     border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: #FBB8B0 !important;">465.2</span></td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">50-64</td>
-<td style="text-align: left;"><span style="     border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: #FFC300 !important;">243.7</span></td>
-<td style="text-align: left;"><span style="     border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: #FFC300 !important;">248.4</span></td>
-<td style="text-align: left;"><span style="     border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: #FFC300 !important;">246.1</span></td>
+<td style="text-align: left;"><span style="     border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: #FDE2DD !important;">243.7</span></td>
+<td style="text-align: left;"><span style="     border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: #FDE2DD !important;">248.4</span></td>
+<td style="text-align: left;"><span style="     border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: #FDE2DD !important;">246.1</span></td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">65+</td>
-<td style="text-align: left;"><span style="     border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: #FF7B00 !important;">609.4</span></td>
-<td style="text-align: left;"><span style="     border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: #FF7B00 !important;">624.8</span></td>
-<td style="text-align: left;"><span style="     border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: #FF7B00 !important;">617.1</span></td>
+<td style="text-align: left;"><span style="     border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: #F8766D !important;">609.4</span></td>
+<td style="text-align: left;"><span style="     border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: #F8766D !important;">624.8</span></td>
+<td style="text-align: left;"><span style="     border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: #F8766D !important;">617.1</span></td>
 </tr>
-</tbody>
+</tbody><tfoot>
+<tr class="odd">
+<td style="text-align: left; padding: 0;"><sup></sup> <span style="color:#555555; font-size:12px;"> Source: SIM CA and LA Morbidity Files + CA DOF Population Estimates </span></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+</tr>
+</tfoot>
+
 </table>
 
 
 </div>
 </div>
 <p>Interpretation: The age groups with the highest infection rate are those over 65 year of age followed by those 18-49 years. Given that the risk does not strictly increase or decrease proportional with age which would be more likely to suggest a biological basis for difference in infection rate, behavioral differences between the age strata should be examined as part of selecting risk reduction strategies.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div class="datatables html-widget html-fill-item" id="htmlwidget-6e0a6c447034b2f40a09" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-6e0a6c447034b2f40a09">{"x":{"filter":"none","vertical":false,"caption":"<caption style=\"caption-side: top;&#10;             text-align: center;&#10;             font-weight: bold;&#10;             font-size: 20px;&#10;             color: black;\">\n  Novel Respiratory Disease in California: New Infection Rate per 100,000\n  <br/>\n  by County\n<\/caption>","data":[["Alameda","Alpine","Amador","Butte","Calaveras","Colusa","Contra Costa","Del Norte","El Dorado","Fresno","Glenn","Humboldt","Imperial","Inyo","Kern","Kings","Lake","Lassen","Los Angeles","Madera","Marin","Mariposa","Mendocino","Merced","Modoc","Mono","Monterey","Napa","Nevada","Orange","Placer","Plumas","Riverside","Sacramento","San Benito","San Bernardino","San Diego","San Francisco","San Joaquin","San Luis Obispo","San Mateo","Santa Barbara","Santa Clara","Santa Cruz","Shasta","Sierra","Siskiyou","Solano","Sonoma","Stanislaus","Sutter","Tehama","Trinity","Tulare","Tuolumne","Ventura","Yolo","Yuba"],[290.3180420213067,354.4233697909456,283.8921933264833,326.5764706988464,338.1654739993708,681.3881055290072,289.9111309083158,334.0498531501195,325.8446028865788,273.8843575164097,291.9896135451888,306.8870396454369,1411.845872250243,867.4596709611976,780.4236828524755,736.894797499447,336.0963498858641,339.9254106527482,290.9274061406551,344.9190550728426,307.9372283167516,363.5250449623082,328.2293097794131,729.5450438239811,386.1343029340096,302.335811482442,326.1901995719973,303.9814785497927,317.3113995630382,284.8910047118389,288.0877192899779,411.5009232392508,287.3984822965512,626.6482404904353,262.2498069433003,725.0241100309989,280.9798651442196,323.7754601435627,617.8401576818245,406.2487302568976,292.7739911482226,292.6164310940414,292.0379327026988,322.8614155412658,292.265368446516,413.4599639757655,356.0618745734128,608.9062137273229,311.4166519772019,643.5723395833638,617.6789482696346,630.6774058884172,252.6576823790069,764.3346981415019,329.1244636697227,290.5009508848347,328.9025413612877,558.2821206820367],[108.6445259608992,113.5262356361623,153.8050880298959,146.6546321803418,187.017946056966,269.492161901466,120.7311245745108,136.4566750056857,160.5453823610213,94.94938114669793,131.0386799952601,138.5012294684529,508.1158287166969,477.5591954686125,249.7774288818681,230.2015745398244,169.7230736965161,154.4803883033666,110.7338738009942,127.3572335793958,155.3362110272881,212.1838288753683,166.1371946506713,237.2481250564742,189.8207206312589,133.1832995919439,128.7585113499941,126.8648339027739,174.4313070299447,112.4610818739856,123.8622463317689,224.3003378119655,112.7560961040761,232.1095392087581,105.8218366705625,245.733353408121,108.2911440322101,123.0724098581327,216.493434638818,195.9648844739526,123.1368149750283,114.6487939611548,113.343263664708,140.8878793143465,141.2838261924135,273.2520058948747,190.270094932313,244.2686688191539,147.6139939437724,233.5190104241789,233.1825123961401,277.3584068126128,132.3251417769376,249.1685323393225,167.00936618012,117.9501037472709,111.844428951562,197.8540062822229]],"container":"<table class=\"display compact cell-border stripe\">\n  <thead>\n    <tr>\n      <th>County<\/th>\n      <th>New Infections<\/th>\n      <th>Severe Infections<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"t<\"bottomcaption\">ip","pageLength":20,"autoWidth":true,"columnDefs":[{"className":"dt-right","targets":[1,2]},{"name":"county","targets":0},{"name":"new_rate","targets":1},{"name":"severe_rate","targets":2}],"order":[],"orderClasses":false,"lengthMenu":[10,20,25,50,100],"rowCallback":"function(row, data, displayNum, displayIndex, dataIndex) {\nvar value=data[0]; $(this.api().cell(row, 0).node()).css({'font-family':'Arial, sans-serif','text-align':'left'});\nvar value=data[1]; $(this.api().cell(row, 1).node()).css({'font-family':'Arial, sans-serif','text-align':'left'});\nvar value=data[2]; $(this.api().cell(row, 2).node()).css({'font-family':'Arial, sans-serif','text-align':'left'});\nvar value=data[1]; $(this.api().cell(row, 1).node()).css({'background-color':isNaN(parseFloat(value)) ? '' : value <= 306.887 ? \"#FFFFFF\" : value <= 363.525 ? \"#FDE2DD\" : value <= 1411.8459 ? \"#FBB8B0\" : \"#F8766D\"});\nvar value=data[2]; $(this.api().cell(row, 2).node()).css({'background-color':isNaN(parseFloat(value)) ? '' : value <= 131.0387 ? \"#FFFFFF\" : value <= 190.2701 ? \"#FDE2DD\" : value <= 508.1158 ? \"#FBB8B0\" : \"#F8766D\"});\n}"}},"evals":["options.rowCallback"],"jsHooks":{"render":[{"code":"\n    function(el) {\n      var caption = document.createElement('div');\n      caption.className = 'bottomcaption';\n      caption.style.textAlign = 'left';\n      caption.style.fontSize = '12px';\n      caption.style.color = '#555';\n      caption.style.marginTop = '10px';\n      caption.innerHTML =\n        'Source: SIM CA and LA Morbidity Files + CA DOF Population Estimates';\n      el.parentNode.appendChild(caption);\n    }\n  ","data":null}]}}</script>
+</div>
+</div>
 <p><strong><em>Discussion 5pts</em></strong></p>
 <p><em>Provide interpretation of results and what they tell your team about the given scenario.</em></p>
 <p>The findings from this project indicate that the burden of the simulated respiratory outbreak was not evenly distributed across California’s population. The race/ethnicity–sex visualization highlights pronounced disparities, with certain racial and ethnic groups experiencing significantly higher infection rates than others. These patterns likely reflect a combination of structural, occupational, and environmental factors rather than biological differences alone. The minimal differences by sex support the interpretation that social and structural factors, access to preventative resources, crowded living or working conditions, or county-level transmission dynamics, play a larger role than sex in shaping infection risk.</p>
-<p>The age-specific results further illuminate these differences. Older adults had markedly higher infection rates, consistent with both greater biological susceptibility and potential differences in exposure or health-seeking behavior. The substantial burden among adults aged 18–49 suggests that working-age individuals may represent an important driver of community transmission, potentially due to workplace exposures or caregiving responsibilities.</p>
-<p>Taken together, these results indicate that an effective outbreak response would require targeted outreach to the most affected racial/ethnic groups and increased support for older adults. Enhancing access to testing, treatment, and prevention resources, along with tailored communication strategies, would likely help reduce both overall transmission and the disparities observed in this simulated scenario. These findings illustrate the importance of demographic-specific analyses in guiding equitable public health action.</p>
+<p>The age-specific results further illuminate these differences. Older adults had markedly higher infection rates, consistent with both greater biological susceptibility and potential differences in exposure or health-seeking behavior. The substantial burden among adults aged 18–49 suggests that working-age individuals may represent an important driver of community transmission, potentially due to workplace exposures or caregiving responsibilities. Age-based differences infection rates do not appear to vary by sex.</p>
+<p>Infection rates vary substantially by county; this is true of both new and severe infections. The five counties with the greatest infection burden are Imperial, Inyo, Kern, Tulare, and Kings. The five counties with the greatest severe infection burden are Imperial, Inyo, Tehama, Sierra, and Colusa. This pattern of overlap without perfect parity between new and severe infection rates is consistent across all 58 counties. These data would help plan support on a geographic basis to ensure that the counties with the greatest disease burden receive the needed resources to both prevent new infections and care for patient with severe infections.</p>
+<p>Taken together, these results indicate that an effective outbreak response would require targeted outreach to the most affected racial/ethnic groups, counties, and increased support for older adults. Enhancing access to testing, treatment, and prevention resources, along with tailored communication strategies, would likely help reduce both overall transmission and the disparities observed in this simulated scenario. These findings illustrate the importance of demographic-specific analyses in guiding equitable public health action.</p>
 <p><strong><em>Uniform theme throughout document 10pts</em></strong></p>
 <p><em>Final html output should all be uniform in format, coloring, text style (it should not look like multiple people have contributed to it)</em></p>
 <p><strong><em>Html output published on RPubs 10pts</em></strong></p>
