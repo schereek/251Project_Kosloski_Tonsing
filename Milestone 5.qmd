@@ -5,7 +5,9 @@ format: html
 editor: visual
 ---
 
-\*\*Everying in italics is cut and paste from the Milestone 6 rubric. My draft responses are non-italicized
+
+
+\*\*Everything in italics is cut and paste from the Milestone 6 rubric. My draft responses are non-italicized
 
 ***Milestone 6 Rubric (note - Max 1,000 words):***
 
@@ -216,6 +218,9 @@ ca_id_rate <- full_join(
 ```
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
+
+sex_colors <- c("Female" = "#FBB8B0",
+                "Male"   = "#F8766D")
 ca_id_rate %>%
   group_by(race_ethnicity, sex) %>%
   summarise(rate = (sum(new_infections) / sum(population)) * 100000) %>%
@@ -225,6 +230,7 @@ ca_id_rate %>%
     fill = sex)) +
   geom_col(position = "dodge") +
   coord_flip() +
+  scale_fill_manual(values = sex_colors) +
   labs(
     title = "Novel Respiratory Disease in California: 
     New Infection Rate per 100,000\nby Race/Ethnicity and Sex, 2023",
@@ -232,10 +238,16 @@ ca_id_rate %>%
     y = "Rate per 100,000",
     fill = "Sex",
     caption = "Source: SIM CA and LA Morbidity Files + CA DOF Population Estimates") +
-  theme_minimal() +
+  theme_minimal(base_size = 12) +
   theme(
     plot.title.position = "plot",
-    plot.title = element_text(hjust = 0.5))
+    plot.title  = element_text(hjust = 0.5, face = "bold", size = 15),
+    axis.title  = element_text(face = "bold"),
+    axis.text   = element_text(color = "#555555"),
+    legend.title = element_text(face = "bold"),
+    plot.caption = element_text(color = "#555555", size = 6),
+    panel.grid.major.y = element_blank()
+  )
 ```
 
 Interpretation: Infection rates for the novel respiratory disease in California show clear racial and ethnic disparities. American Indian or Alaska Native and White, Non-Hispanic populations experience the highest infection rates, followed by Black, Non-Hispanic and Hispanic populations. Native Hawaiian or Pacific Islander, Asian, and Multiracial populations have noticeably lower rates. Differences between males and females within each racial/ethnic group are present but relatively small compared with the larger disparities across groups.
@@ -293,6 +305,10 @@ county_table <- ca_id_rate %>%
   summarise(new_rate = (sum(new_infections) / sum(population)) * 100000,
             severe_rate = (sum(cumulative_severe)/ sum(population)) * 100000,
             .groups = "drop") %>%
+  mutate(
+    new_rate = round(new_rate, 1),
+    severe_rate = round(severe_rate, 1)
+  ) %>%
   arrange(county)
 
 pal <- colorRampPalette(c("#FFFFFF", "#FDE2DD", "#FBB8B0", "#F8766D"))(4)
@@ -318,17 +334,18 @@ datatable(
     "by County"
   ),
   options = list(
-    dom = 't<"bottomcaption">ip',
-    pageLength = 20,
-    autoWidth = TRUE
-  ),
+  dom = 't<"bottomcaption"ip>',
+  pageLength = 20,
+  autoWidth = TRUE,
+  columnDefs = list(
+    list(className = 'dt-right', targets = c(1, 2))   
+  )),
   class = "display compact cell-border stripe"
 ) %>%
 
   formatStyle(
-    columns = c("county", "new_rate", "severe_rate"),
-    fontFamily = "Arial, sans-serif",
-    textAlign = "left"
+  columns = c("county", "new_rate", "severe_rate"),
+  fontFamily = "Arial, sans-serif"
   ) %>%
   formatStyle(
     "new_rate",
