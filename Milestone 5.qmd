@@ -5,8 +5,6 @@ format: html
 editor: visual
 ---
 
-
-
 \*\*Everything in italics is cut and paste from the Milestone 6 rubric. My draft responses are non-italicized
 
 ***Milestone 6 Rubric (note - Max 1,000 words):***
@@ -205,7 +203,7 @@ morbidity_collapsed<-morbidity_all%>%
 ```{r, include=FALSE}
 # Join morbidity and population datasets into a new object
 ca_id_rate <- full_join(
-  morbidity_all,
+  morbidity_collapsed,
   ca_pop_collapsed,
   by = c("county", "sex", "race_ethnicity", "age_cat")
 )
