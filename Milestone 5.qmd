@@ -5,34 +5,13 @@ format: html
 editor: visual
 ---
 
-\*\*Everything in italics is cut and paste from the Milestone 6 rubric. My draft responses are non-italicized
-
-***Milestone 6 Rubric (note - Max 1,000 words):***
-
-***Include 2+ visualizations (based on group size): 20pts***
-
-*- 1 (one) print quality table as requested in scenario\
-- 1 (one) print quality plot or chart as requested in scenario,\
-- 1 (one) additional print quality table or plot of your choice (can support the requested data in the scenario, or answer a different question using the same data sources).\
-\
-Visualizations should have clear titles, column/axis labels, legends (if applicable), footnotes (if applicable).\
-\
-Visualizations should also be relevant to the scenario and should support any conclusions drawn in the report.\
-\
-18 pts for visualizations\
-2 pts for visualizations being cohesive (same text formatting, coloring, etc).*
-
-***Problem statement 5pts***
-
-*Include 1-2 paragraphs describing the scenario that your team is aiming to address. This can be similar to the scenario text, but please phrase in your own words.*
+**Problem statement**
 
 For this project, we worked within the scenario of a statewide public health response to a simulated outbreak of a novel respiratory pathogen in California in 2023. The available data included weekly morbidity counts for all counties (with Los Angeles County provided separately) and 2023 population estimates for the same demographic strata. These datasets allowed us to examine disease occurrence by age group, sex, race/ethnicity, and county.
 
 The primary objective of our analysis was to describe how infections were distributed across demographic and geographic groups. By calculating case counts and incidence rates for key populations, we aimed to identify disparities in disease burden and provide evidence to guide resource allocation during the outbreak. This descriptive epidemiologic assessment supports understanding which communities and demographic groups may be most affected and where public health interventions may need to be concentrated.
 
-***Methods 5pts***
-
-*Describe data sources, methods used, strategies for data cleaning, creating new variables, decisions team made about the data, and additional wrangling done for visualizations.*
+**Methods**
 
 We used three datasets provided for Scenario 1: weekly morbidity data for all California counties except Los Angeles, a parallel morbidity file for Los Angeles County, and 2023 population estimates for all demographic strata. Together, these sources enabled statewide analysis of new infections and incidence rates by age, sex, race/ethnicity, and county.
 
@@ -42,9 +21,7 @@ Data cleaning focused on harmonizing demographic variables across files so the d
 
 To support analysis, we created new variables including total case counts per demographic stratum and incidence rates per 100,000 population. We reordered factor levels and refined category labels to ensure that visualizations were interpretable and aligned with assignment requirements. As a team, we chose to focus on one primary visualization (race/ethnicity by sex) and one primary table (age by sex) to meet the scenario while maintaining clarity. Additional wrangling, such as numeric formatting, ordering categories by rate, and applying consistent labels, was performed to produce publication-ready outputs.
 
-***Results 5pts***
-
-*Describe the results of your analysis, including what is displayed in the visualizations. (Note: no statistical testing is needed)*
+**Results**
 
 ```{r import and clean, include=FALSE}
 # Import libraries
@@ -239,7 +216,7 @@ ca_id_rate %>%
     axis.title  = element_text(face = "bold"),
     axis.text   = element_text(color = "#555555"),
     legend.title = element_text(face = "bold"),
-    plot.caption = element_text(color = "#555555", size = 6),
+    plot.caption = element_text(color = "#555555", size = 8),
     panel.grid.major.y = element_blank()
   )
 ```
@@ -262,11 +239,11 @@ pal <- colorRampPalette(c("#FFFFFF", "#FDE2DD", "#FBB8B0", "#F8766D"))(nrow(age_
 
 age_table_color <- age_table2 %>%
   mutate(
-    Female = cell_spec(round(Female, 1), "html",
+    Female = cell_spec(comma(round(Female, 1)), "html",
                        background = pal[rank(Female, ties.method = "first")]),
-    Male = cell_spec(round(Male, 1), "html",
+    Male = cell_spec(comma(round(Male, 1)), "html",
                      background = pal[rank(Male, ties.method = "first")]),
-    Overall = cell_spec(round(Overall, 1), "html",
+    Overall = cell_spec(comma(round(Overall, 1)), "html",
                         background = pal[rank(Overall, ties.method = "first")])
   )
 
@@ -291,20 +268,10 @@ kable(age_table_color,
 )
 ```
 
-***Discussion 5pts***
-
-*Provide interpretation of results and what they tell your team about the given scenario.*
+**Discussion**
 
 The findings from this project indicate that the burden of the simulated respiratory outbreak was not evenly distributed across California’s population. The race/ethnicity–sex visualization highlights pronounced disparities, with certain racial and ethnic groups experiencing significantly higher infection rates than others. These patterns likely reflect a combination of structural, occupational, and environmental factors rather than biological differences alone. The minimal differences by sex support the interpretation that social and structural factors, access to preventative resources, crowded living or working conditions, or local transmission dynamics, play a larger role than sex in shaping infection risk.
 
 The age-specific results further illuminate these differences. Older adults had markedly higher infection rates, consistent with both greater biological susceptibility, underlying health conditions, and potential differences in exposure or health-seeking behavior. The substantial burden among adults aged 18–49 suggests that working-age individuals may represent an important driver of community transmission, potentially due to workplace exposures or care-giving responsibilities. Another potential factor that could impact the rates for all age groups, is testing behavior. If certain age groups are being tested more frequently (i.e. through a work-based program) the incidence numbers for that group would increase even if the true incidence rates were more homogeneous across age groups. However, additional data on rates of testing by age-group would be necessary to assess the impact of this factor. Age-based differences in infection rates do not appear to vary significantly by sex.
 
 Taken together, these results indicate that an effective outbreak response would require targeted outreach to the most affected racial/ethnic groups and increased support for older adults. Enhancing access to testing, treatment, and prevention resources, along with tailored communication strategies, would likely help reduce both overall transmission and the disparities observed in this simulated scenario. These findings illustrate the importance of demographic-specific analyses in guiding equitable public health action.
-
-***Uniform theme throughout document 10pts***
-
-*Final html output should all be uniform in format, coloring, text style (it should not look like multiple people have contributed to it)*
-
-***Html output published on RPubs 10pts***
-
-*Final outputs should include all necessary code to generate html output. No excess codes or unnecessary comments should be included. For html, make sure no code is printed so that it looks like a polished report.*
