@@ -271,3 +271,71 @@ age_rate_severity %>%
 ```
 
 Interpretation: Infection rates per 100,000 are highest among adults aged 65+ and 18–49, but severe case rates rise sharply with age and are highest in the 65+ group. Children 0–17 have both the lowest infection rates and the lowest severe case rates, indicating that older adults experience a disproportionate burden of severe disease even when infection occurs across all age groups.
+
+```{r}
+{r, echo=FALSE, message=FALSE, warning=FALSE}
+county_table <- ca_id_rate %>%
+  group_by(county) %>%
+  summarise(new_rate = (sum(new_infections) / sum(population)) * 100000,
+            severe_rate = (sum(cumulative_severe)/ sum(population)) * 100000,
+            .groups = "drop") %>%
+  arrange(county)
+
+pal <- colorRampPalette(c("#FFFFFF", "#FDE2DD", "#FBB8B0", "#F8766D"))(4)
+
+# Make quantile cuts to use gradient styling to match age table
+new_cuts    <- quantile(county_table$new_rate,    
+                        probs = seq(0, 1, length.out = 4), na.rm = TRUE)[-1]
+severe_cuts <- quantile(county_table$severe_rate, 
+                        probs = seq(0, 1, length.out = 4), na.rm = TRUE)[-1]
+
+datatable(
+  county_table,
+  rownames = FALSE,
+  colnames = c("County", "New Infections", "Severe Infections"),
+  caption = htmltools::tags$caption(
+    style = "caption-side: top;
+             text-align: center;
+             font-weight: bold;
+             font-size: 20px;
+             color: black;",
+    "Novel Respiratory Disease in California: New Infection Rate per 100,000",
+    htmltools::tags$br(),
+    "by County"
+  ),
+  options = list(
+    dom = 't<"bottomcaption">ip',
+    pageLength = 20,
+    autoWidth = TRUE
+  ),
+  class = "display compact cell-border stripe"
+) %>%
+
+  formatStyle(
+    columns = c("county", "new_rate", "severe_rate"),
+    fontFamily = "Arial, sans-serif",
+    textAlign = "left"
+  ) %>%
+  formatStyle(
+    "new_rate",
+    backgroundColor = styleInterval(new_cuts, pal)
+  ) %>%
+  formatStyle(
+    "severe_rate",
+    backgroundColor = styleInterval(severe_cuts, pal)
+  ) %>%
+  htmlwidgets::onRender("
+    function(el) {
+      var caption = document.createElement('div');
+      caption.className = 'bottomcaption';
+      caption.style.textAlign = 'left';
+      caption.style.fontSize = '12px';
+      caption.style.color = '#555';
+      caption.style.marginTop = '10px';
+      caption.innerHTML =
+        'Source: SIM CA and LA Morbidity Files + CA DOF Population Estimates';
+      el.parentNode.appendChild(caption);
+    }
+  ")
+```
+
