@@ -5,7 +5,9 @@ format: html
 editor: visual
 ---
 
-\*\*Everying in italics is cut and paste from the Milestone 6 rubric. My draft responses are non-italicized
+
+
+\*\*Everything in italics is cut and paste from the Milestone 6 rubric. My draft responses are non-italicized
 
 ***Milestone 6 Rubric (note - Max 1,000 words):***
 
@@ -212,6 +214,9 @@ ca_id_rate <- full_join(
 Our analysis revealed clear patterns in the distribution of new infections across demographic groups in California. After merging morbidity and population data, we calculated incidence rates per 100,000 population, which were summarized by race/ethnicity and sex in the primary visualization. This horizontal bar chart showed notable disparities: American Indian or Alaska Native and White, Non-Hispanic populations had the highest infection rates, followed by Black and Hispanic populations. Asian, Native Hawaiian or Pacific Islander, and Multiracial groups showed substantially lower rates. Differences between males and females within each racial/ethnic group were relatively small compared with the wider disparities across groups.
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
+
+sex_colors <- c("Female" = "#FBB8B0",
+                "Male"   = "#F8766D")
 ca_id_rate %>%
   group_by(race_ethnicity, sex) %>%
   summarise(rate = (sum(new_infections) / sum(population)) * 100000) %>%
@@ -221,6 +226,7 @@ ca_id_rate %>%
     fill = sex)) +
   geom_col(position = "dodge") +
   coord_flip() +
+  scale_fill_manual(values = sex_colors) +
   labs(
     title = "Novel Respiratory Disease in California: 
     New Infection Rate per 100,000\nby Race/Ethnicity and Sex, 2023",
@@ -228,10 +234,16 @@ ca_id_rate %>%
     y = "Rate per 100,000",
     fill = "Sex",
     caption = "Source: SIM CA and LA Morbidity Files + CA DOF Population Estimates") +
-  theme_minimal() +
+  theme_minimal(base_size = 12) +
   theme(
     plot.title.position = "plot",
-    plot.title = element_text(hjust = 0.5))
+    plot.title  = element_text(hjust = 0.5, face = "bold", size = 15),
+    axis.title  = element_text(face = "bold"),
+    axis.text   = element_text(color = "#555555"),
+    legend.title = element_text(face = "bold"),
+    plot.caption = element_text(color = "#555555", size = 6),
+    panel.grid.major.y = element_blank()
+  )
 ```
 
 The table below summarizes infection rates by age group and sex. Adults aged 65 and older experienced the highest infection rates overall, followed by adults aged 18–49. Rates were lower among those aged 50–64 and lowest among children ages 0–17. The table used a color gradient to highlight relative magnitudes of infection burden across age groups. Together, the table and the visualization provide a cohesive summary of how racial/ethnic identity and age shape the distribution of infections in this simulated outbreak.
@@ -281,6 +293,82 @@ kable(age_table_color,
 )
 ```
 
+<<<<<<< HEAD
+=======
+Interpretation: The age groups with the highest infection rate are those over 65 year of age followed by those 18-49 years. Given that the risk does not strictly increase or decrease proportional with age which would be more likely to suggest a biological basis for difference in infection rate, behavioral differences between the age strata should be examined as part of selecting risk reduction strategies.
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+county_table <- ca_id_rate %>%
+  group_by(county) %>%
+  summarise(new_rate = (sum(new_infections) / sum(population)) * 100000,
+            severe_rate = (sum(cumulative_severe)/ sum(population)) * 100000,
+            .groups = "drop") %>%
+  mutate(
+    new_rate = round(new_rate, 1),
+    severe_rate = round(severe_rate, 1)
+  ) %>%
+  arrange(county)
+
+pal <- colorRampPalette(c("#FFFFFF", "#FDE2DD", "#FBB8B0", "#F8766D"))(4)
+
+# Make quantile cuts to use gradient styling to match age table
+new_cuts    <- quantile(county_table$new_rate,    
+                        probs = seq(0, 1, length.out = 4), na.rm = TRUE)[-1]
+severe_cuts <- quantile(county_table$severe_rate, 
+                        probs = seq(0, 1, length.out = 4), na.rm = TRUE)[-1]
+
+datatable(
+  county_table,
+  rownames = FALSE,
+  colnames = c("County", "New Infections", "Severe Infections"),
+  caption = htmltools::tags$caption(
+    style = "caption-side: top;
+             text-align: center;
+             font-weight: bold;
+             font-size: 20px;
+             color: black;",
+    "Novel Respiratory Disease in California: New Infection Rate per 100,000",
+    htmltools::tags$br(),
+    "by County"
+  ),
+  options = list(
+  dom = 't<"bottomcaption"ip>',
+  pageLength = 20,
+  autoWidth = TRUE,
+  columnDefs = list(
+    list(className = 'dt-right', targets = c(1, 2))   
+  )),
+  class = "display compact cell-border stripe"
+) %>%
+
+  formatStyle(
+  columns = c("county", "new_rate", "severe_rate"),
+  fontFamily = "Arial, sans-serif"
+  ) %>%
+  formatStyle(
+    "new_rate",
+    backgroundColor = styleInterval(new_cuts, pal)
+  ) %>%
+  formatStyle(
+    "severe_rate",
+    backgroundColor = styleInterval(severe_cuts, pal)
+  ) %>%
+  htmlwidgets::onRender("
+    function(el) {
+      var caption = document.createElement('div');
+      caption.className = 'bottomcaption';
+      caption.style.textAlign = 'left';
+      caption.style.fontSize = '12px';
+      caption.style.color = '#555';
+      caption.style.marginTop = '10px';
+      caption.innerHTML =
+        'Source: SIM CA and LA Morbidity Files + CA DOF Population Estimates';
+      el.parentNode.appendChild(caption);
+    }
+  ")
+```
+
+>>>>>>> fedf658bd00846cb132df0d51326496df9badfc0
 ***Discussion 5pts***
 
 *Provide interpretation of results and what they tell your team about the given scenario.*
