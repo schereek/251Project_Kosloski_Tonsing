@@ -1,6 +1,6 @@
 ---
 title: "Milestone 6"
-author: "Koslowski & Tonsing"
+author: "Kosloski & Tonsing"
 format:
   html:
     toc: true
